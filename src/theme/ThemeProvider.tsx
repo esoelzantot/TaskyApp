@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [override, setOverride] = useState<ThemeMode | null>(null);
 
   const mode: ThemeMode =
-    override ?? (systemScheme === "dark" ? "light" : "light");
+    override ?? (systemScheme === "dark" ? "dark" : "light");
   const theme = mode === "dark" ? darkTheme : lightTheme;
 
   const value = useMemo<ThemeContextValue>(

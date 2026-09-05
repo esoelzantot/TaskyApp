@@ -1,30 +1,24 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
 
-import { IconSymbol } from '@/src/components/ui/icon-symbol';
-import { useColors } from '@/src/theme';
+import { BottomTabBar } from "@/src/components/tab-bar/bottom-tab-bar";
 
 export default function TabLayout() {
-  const colors = useColors();
-
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.surfaceMuted,
-          borderTopColor: colors.border,
-        },
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
+      screenOptions={{ headerShown: false }}
+      tabBar={(props) => (
+        <BottomTabBar
+          {...props}
+          onAddPress={() => {
+            // TODO: wire up once an "add task" screen/flow exists.
+          }}
+        />
+      )}
+    >
+      <Tabs.Screen name="index" />
+      <Tabs.Screen name="calendar" />
+      <Tabs.Screen name="history" />
+      <Tabs.Screen name="profile" />
     </Tabs>
   );
 }
