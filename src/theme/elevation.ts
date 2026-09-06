@@ -7,7 +7,7 @@ import { ThemeElevation } from "./types";
 export function buildElevation(primaryColor: string): ThemeElevation {
   return {
     level1: {
-      shadowColor: "#adadad",
+      shadowColor: "#cccccc",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.04,
       shadowRadius: 24,
