@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 import { ScreenHeader } from "@/src/components/screen-header/screen-header";
+import { DangerButton } from "@/src/components/tasks/danger-button";
 import { DateField } from "@/src/components/tasks/date-field";
 import {
   DropdownField,
@@ -11,10 +12,16 @@ import {
 import { PrimaryButton } from "@/src/components/tasks/primary-button";
 import { TextField } from "@/src/components/tasks/text-field";
 import type { Category } from "@/src/models/category";
-import { AddTaskFormValues, PRIORITIES, Priority } from "@/src/models/task";
+import {
+  EditTaskFormValues,
+  PRIORITIES,
+  Priority,
+  TASK_STATUSES,
+  TaskStatus,
+} from "@/src/models/task";
 import { useGetCategoriesQuery } from "@/src/rtk/categories-api-slice";
 import { useTheme } from "@/src/theme";
-import styles from "./add-task-styles";
+import styles from "./edit-task-styles";
 
 const PRIORITY_OPTIONS: DropdownFieldOption<Priority>[] = PRIORITIES.map(
   (priority) => ({
@@ -23,25 +30,44 @@ const PRIORITY_OPTIONS: DropdownFieldOption<Priority>[] = PRIORITIES.map(
   }),
 );
 
-interface AddTaskScreenProps {
-  onSubmit: (values: AddTaskFormValues) => void;
+const STATUS_OPTIONS: DropdownFieldOption<TaskStatus>[] = TASK_STATUSES.map(
+  (status) => ({
+    label: status,
+    value: status,
+  }),
+);
+
+interface EditTaskScreenProps {
+  /** The task being edited — pre-fills every field below. */
+  initialValues: EditTaskFormValues;
+  onSubmit: (values: EditTaskFormValues) => void;
+  onCancel: () => void;
   submitting?: boolean;
 }
 
-export function AddTaskScreen({
+export function EditTaskScreen({
+  initialValues,
   onSubmit,
+  onCancel,
   submitting = false,
-}: AddTaskScreenProps) {
+}: EditTaskScreenProps) {
   const { colors, spacing } = useTheme();
   const { data: categories, isLoading: categoriesLoading } =
     useGetCategoriesQuery();
 
-  const [categoryId, setCategoryId] = useState<Category["id"] | null>(null);
-  const [categoryName, setCategoryName] = useState<string | null>(null);
-  const [projectName, setProjectName] = useState("");
-  const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState<Date | null>(null);
-  const [priority, setPriority] = useState<Priority | null>(null);
+  const [categoryId, setCategoryId] = useState<Category["id"] | null>(
+    initialValues.categoryId,
+  );
+  const [categoryName, setCategoryName] = useState<string | null>(
+    initialValues.categoryName,
+  );
+  const [projectName, setProjectName] = useState(initialValues.projectName);
+  const [description, setDescription] = useState(initialValues.description);
+  const [dueDate, setDueDate] = useState<Date | null>(initialValues.dueDate);
+  const [priority, setPriority] = useState<Priority | null>(
+    initialValues.priority,
+  );
+  const [status, setStatus] = useState<TaskStatus | null>(initialValues.status);
 
   const categoryOptions = useMemo<DropdownFieldOption<Category["id"]>[]>(
     () =>
@@ -57,7 +83,8 @@ export function AddTaskScreen({
     !!categoryName &&
     projectName.trim().length > 0 &&
     !!dueDate &&
-    !!priority;
+    !!priority &&
+    !!status;
 
   const handleSubmit = () => {
     if (
@@ -65,17 +92,20 @@ export function AddTaskScreen({
       categoryId === null ||
       !categoryName ||
       !dueDate ||
-      !priority
+      !priority ||
+      !status
     )
       return;
 
     onSubmit({
+      taskId: initialValues.taskId,
       categoryId,
       categoryName,
       projectName: projectName.trim(),
       description: description.trim(),
       dueDate,
       priority,
+      status,
     });
   };
 
@@ -84,7 +114,7 @@ export function AddTaskScreen({
       style={[styles.flex, { backgroundColor: colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScreenHeader title="Add Project" />
+      <ScreenHeader title="Edit Project" />
       <ScrollView
         contentContainerStyle={{ padding: spacing[16] }}
         keyboardShouldPersistTaps="handled"
@@ -123,12 +153,7 @@ export function AddTaskScreen({
         />
         <View style={{ height: spacing[16] }} />
 
-        <DateField
-          label="Due Date"
-          value={dueDate}
-          onChange={setDueDate}
-          minimumDate={new Date()}
-        />
+        <DateField label="Due Date" value={dueDate} onChange={setDueDate} />
         <View style={{ height: spacing[16] }} />
 
         <DropdownField
@@ -141,14 +166,43 @@ export function AddTaskScreen({
           iconBackgroundColor={colors.primaryLight}
           onChange={(option) => setPriority(option.value)}
         />
+        <View style={{ height: spacing[16] }} />
+
+        <DropdownField
+          label="Status"
+          placeholder="Select status"
+          variant="tinted"
+          data={STATUS_OPTIONS}
+          value={status}
+          icon={
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={18}
+              color={colors.primary}
+            />
+          }
+          iconBackgroundColor={colors.primaryLight}
+          onChange={(option) => setStatus(option.value)}
+        />
         <View style={{ height: spacing[24] }} />
 
-        <PrimaryButton
-          label="Add Project"
-          onPress={handleSubmit}
-          loading={submitting}
-          disabled={!canSubmit}
-        />
+        <View style={styles.buttonRow}>
+          <View style={[styles.buttonSlot, { marginRight: spacing[8] }]}>
+            <PrimaryButton
+              label="Edit"
+              onPress={handleSubmit}
+              loading={submitting}
+              disabled={!canSubmit}
+            />
+          </View>
+          <View style={[styles.buttonSlot, { marginLeft: spacing[8] }]}>
+            <DangerButton
+              label="Cancel"
+              onPress={onCancel}
+              disabled={submitting}
+            />
+          </View>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
