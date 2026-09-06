@@ -6,6 +6,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  body: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   title: {},
   subtitle: {
     textAlign: "center",

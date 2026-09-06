@@ -1,29 +1,38 @@
+import { HomeHeader } from "@/src/components/home-header/home-header";
 import { useTheme } from "@/src/theme";
 import { Text, View } from "react-native";
-import styles from "./home-styles";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import styles from "./home-screen-styles";
 
 export default function HomeScreen() {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: theme.colors.background,
-          padding: theme.spacing[24],
-        },
-      ]}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
-      <Text
-        style={[
-          styles.title,
-          theme.typography.heading1,
-          { color: theme.colors.textPrimary },
-        ]}
+      <View
+        style={{
+          paddingTop: insets.top + theme.spacing[16],
+          paddingHorizontal: theme.spacing[24],
+        }}
       >
-        HOME SCREEN
-      </Text>
+        {/* TODO: replace with the signed-in user's real name/avatar once auth exists. */}
+        <HomeHeader userName="User" />
+      </View>
+
+      <View style={styles.body}>
+        <Text
+          style={[
+            styles.title,
+            theme.typography.heading1,
+            { color: theme.colors.textPrimary },
+          ]}
+        >
+          HOME SCREEN
+        </Text>
+      </View>
     </View>
   );
 }
