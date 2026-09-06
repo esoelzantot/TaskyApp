@@ -14,6 +14,7 @@ import type { Category } from "@/src/models/category";
 import { AddTaskFormValues, PRIORITIES, Priority } from "@/src/models/task";
 import { useGetCategoriesQuery } from "@/src/rtk/categories-api-slice";
 import { useTheme } from "@/src/theme";
+import { FormSkeleton } from "@/src/utils/form-skeleton";
 import styles from "./add-task-styles";
 
 const PRIORITY_OPTIONS: DropdownFieldOption<Priority>[] = PRIORITIES.map(
@@ -79,6 +80,15 @@ export function AddTaskScreen({
     });
   };
 
+  if (categoriesLoading) {
+    return (
+      <View style={[styles.flex, { backgroundColor: colors.background }]}>
+        <ScreenHeader title="Add Project" />
+        <FormSkeleton />
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       style={[styles.flex, { backgroundColor: colors.background }]}
@@ -94,7 +104,6 @@ export function AddTaskScreen({
           placeholder="Select a group"
           data={categoryOptions}
           value={categoryId}
-          loading={categoriesLoading}
           icon={
             <Ionicons name="pricetag" size={18} color={colors.accentPink} />
           }

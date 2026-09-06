@@ -1,6 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+
+import styles from "./edit-task-styles";
 
 import { ScreenHeader } from "@/src/components/screen-header/screen-header";
 import { DangerButton } from "@/src/components/tasks/danger-button";
@@ -21,7 +23,7 @@ import {
 } from "@/src/models/task";
 import { useGetCategoriesQuery } from "@/src/rtk/categories-api-slice";
 import { useTheme } from "@/src/theme";
-import styles from "./edit-task-styles";
+import { FormSkeleton } from "@/src/utils/form-skeleton";
 
 const PRIORITY_OPTIONS: DropdownFieldOption<Priority>[] = PRIORITIES.map(
   (priority) => ({
@@ -59,7 +61,7 @@ export function EditTaskScreen({
     initialValues.categoryId,
   );
   const [categoryName, setCategoryName] = useState<string | null>(
-    initialValues.categoryName,
+    initialValues.categoryName || null,
   );
   const [projectName, setProjectName] = useState(initialValues.projectName);
   const [description, setDescription] = useState(initialValues.description);
@@ -68,6 +70,13 @@ export function EditTaskScreen({
     initialValues.priority,
   );
   const [status, setStatus] = useState<TaskStatus | null>(initialValues.status);
+
+  useEffect(() => {
+    if (categoryName || !categories || categoryId === null) return;
+    const match = categories.find((category) => category.id === categoryId);
+    if (match) setCategoryName(match.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories]);
 
   const categoryOptions = useMemo<DropdownFieldOption<Category["id"]>[]>(
     () =>
@@ -109,6 +118,15 @@ export function EditTaskScreen({
     });
   };
 
+  if (categoriesLoading) {
+    return (
+      <View style={[styles.flex, { backgroundColor: colors.background }]}>
+        <ScreenHeader title="Edit Project" />
+        <FormSkeleton />
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       style={[styles.flex, { backgroundColor: colors.background }]}
@@ -124,7 +142,6 @@ export function EditTaskScreen({
           placeholder="Select a group"
           data={categoryOptions}
           value={categoryId}
-          loading={categoriesLoading}
           icon={
             <Ionicons name="pricetag" size={18} color={colors.accentPink} />
           }

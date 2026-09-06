@@ -1,6 +1,7 @@
 import type { ThemeColors } from "@/src/theme";
 import { useTheme } from "@/src/theme";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { router } from "expo-router";
 import { FlatList, Pressable, Text, View } from "react-native";
 import styles from "./task-groups-section-styles";
 
@@ -98,7 +99,12 @@ export function TaskGroupsSection({
 
           return (
             <Pressable
-              onPress={() => onGroupPress?.(item.id)}
+              onPress={() =>
+                router.push({
+                  pathname: "/category-tasks/[id]",
+                  params: { id: String(42), name: "GIG Program" },
+                })
+              }
               style={[
                 styles.card,
                 {

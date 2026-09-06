@@ -105,20 +105,25 @@ export function BottomTabBar({
       </View>
 
       <Pressable
-        onPress={() =>
-          router.push({
-            pathname: "/edit-task/[id]",
-            params: {
-              id: String(11),
-              categoryId: "42",
-              projectName: "Tasky App",
-              description:
-                "Implement the new task management features in the app.",
-              dueDate: "2023-08-15",
-              priority: "High",
-              status: "Active",
-            },
-          })
+        onPress={
+          () =>
+            router.push({
+              pathname: "/edit-task/[id]",
+              params: {
+                id: String(11),
+                categoryId: "42",
+                projectName: "Tasky App",
+                description:
+                  "Implement the new task management features in the app.",
+                dueDate: "2023-08-15",
+                priority: "High",
+                status: "Active",
+              },
+            })
+
+          // router.push({
+          //   pathname: "/add-task",
+          // })
         }
         style={[
           styles.fab,

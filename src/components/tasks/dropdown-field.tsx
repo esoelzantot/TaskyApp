@@ -17,12 +17,10 @@ interface DropdownFieldProps<T extends string | number> {
   label: string;
   placeholder?: string;
   data: DropdownFieldOption<T>[];
-  /** The selected option's `value` (e.g. a category id), or null when nothing is chosen yet. */
   value: T | null;
   onChange: (option: DropdownFieldOption<T>) => void;
   icon: React.ReactNode;
   iconBackgroundColor: string;
-  /** "surface" = white card (Task Group). "tinted" = light-purple card (Priority). */
   variant?: "surface" | "tinted";
   loading?: boolean;
   disabled?: boolean;
@@ -49,11 +47,15 @@ export function DropdownField<T extends string | number>({
       <View style={styles.row}>
         <IconBubble backgroundColor={iconBackgroundColor}>{icon}</IconBubble>
         <View style={[styles.content, { marginLeft: spacing[12] }]}>
-          <Text style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing[2] }]}>
+          <Text
+            style={[
+              typography.caption,
+              { color: colors.textSecondary, marginBottom: spacing[2] },
+            ]}
+          >
             {label}
           </Text>
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          <Dropdown<any>
+          <Dropdown
             data={data}
             labelField="label"
             valueField="value"
@@ -68,11 +70,21 @@ export function DropdownField<T extends string | number>({
             ]}
             itemContainerStyle={{ borderRadius: radii.sm }}
             activeColor={colors.primarySurface}
-            selectedTextStyle={[typography.subtitle, { color: colors.textPrimary }]}
-            placeholderStyle={[typography.subtitle, { color: colors.textDisabled }]}
+            selectedTextStyle={[
+              typography.subtitle,
+              { color: colors.textPrimary },
+            ]}
+            placeholderStyle={[
+              typography.subtitle,
+              { color: colors.textDisabled },
+            ]}
             itemTextStyle={[typography.body, { color: colors.textPrimary }]}
             renderRightIcon={() => (
-              <Ionicons name="chevron-down" size={16} color={colors.textPrimary} />
+              <Ionicons
+                name="chevron-down"
+                size={16}
+                color={colors.textPrimary}
+              />
             )}
           />
         </View>

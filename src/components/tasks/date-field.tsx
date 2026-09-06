@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -17,10 +19,20 @@ interface DateFieldProps {
 }
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
-export function DateField({ label, value, onChange, minimumDate, placeholder = "Select date" }: DateFieldProps) {
+export function DateField({
+  label,
+  value,
+  onChange,
+  minimumDate,
+  placeholder = "Select date",
+}: DateFieldProps) {
   const { colors, typography, spacing } = useTheme();
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -47,11 +59,19 @@ export function DateField({ label, value, onChange, minimumDate, placeholder = "
           <Ionicons name="calendar-outline" size={18} color={colors.primary} />
         </IconBubble>
         <View style={[styles.content, { marginLeft: spacing[12] }]}>
-          <Text style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing[2] }]}>
+          <Text
+            style={[
+              typography.caption,
+              { color: colors.textSecondary, marginBottom: spacing[2] },
+            ]}
+          >
             {label}
           </Text>
           <Text
-            style={[typography.subtitle, { color: value ? colors.textPrimary : colors.textDisabled }]}
+            style={[
+              typography.subtitle,
+              { color: value ? colors.textPrimary : colors.textDisabled },
+            ]}
           >
             {value ? formatDate(value) : placeholder}
           </Text>
@@ -65,7 +85,7 @@ export function DateField({ label, value, onChange, minimumDate, placeholder = "
           mode="date"
           display={Platform.OS === "ios" ? "inline" : "default"}
           minimumDate={minimumDate}
-          onChange={handleChange}
+          onValueChange={() => handleChange}
         />
       )}
     </FieldCard>
