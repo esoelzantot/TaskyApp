@@ -5,6 +5,7 @@ import styles from "./bottom-tab-bar-styles";
 
 import AppAssets from "@/src/constants/app-assets";
 import { useTheme } from "@/src/theme";
+import { router } from "expo-router";
 
 /** Route name → its icon. Add an entry here for every tab this bar renders. */
 const ICON_BY_ROUTE_NAME: Record<string, number> = {
@@ -104,7 +105,7 @@ export function BottomTabBar({
       </View>
 
       <Pressable
-        onPress={onAddPress}
+        onPress={() => router.push("/add-task")}
         style={[
           styles.fab,
           {

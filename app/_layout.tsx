@@ -48,6 +48,7 @@ function RootNavigator() {
     <NavigationThemeProvider value={navigationTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="add-task" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={mode === "dark" ? "light" : "dark"} />
     </NavigationThemeProvider>

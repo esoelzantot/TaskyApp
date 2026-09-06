@@ -1,0 +1,45 @@
+import type { Category } from "./category";
+
+/** The only three priority levels the Add Task screen allows. */
+export type Priority = "Low" | "Medium" | "High";
+
+export const PRIORITIES: readonly Priority[] = ["Low", "Medium", "High"];
+
+// CREATE TASK REQUEST TYPES AND HELPERS
+export interface AddTaskFormValues {
+  categoryId: Category["id"];
+  categoryName: string;
+  projectName: string;
+  description: string;
+  dueDate: Date;
+  priority: Priority;
+}
+
+export interface CreateTaskRequest {
+  title: string;
+  description: string;
+  due_date: string;
+  priority: Priority;
+  category_id: number;
+}
+
+/** Formats a `Date` as the "YYYY-MM-DD" */
+export function formatDueDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+/** Maps the Add Task screen's form values to the `POST /tasks/` request body. */
+export function toCreateTaskRequest(
+  values: AddTaskFormValues,
+): CreateTaskRequest {
+  return {
+    title: values.projectName,
+    description: values.description,
+    due_date: formatDueDate(values.dueDate),
+    priority: values.priority,
+    category_id: Number(values.categoryId),
+  };
+}
