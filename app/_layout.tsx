@@ -7,6 +7,7 @@ import {
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { Provider as ReduxProvider } from "react-redux";
 
@@ -99,7 +100,9 @@ export default function RootLayout() {
   return (
     <ReduxProvider store={store}>
       <ThemeProvider>
-        <RootNavigator />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <RootNavigator />
+        </GestureHandlerRootView>
       </ThemeProvider>
     </ReduxProvider>
   );

@@ -1,10 +1,11 @@
-import { CreateCategoryDialog } from "@/src/components/dialogs/create-category-dialog";
+import { CategoryDialog } from "@/src/components/dialogs/category-dialog";
 import { HomeHeader } from "@/src/components/home-header/home-header";
 import { HomeProgressCard } from "@/src/components/home-progress-card/home-progress-card";
 import { InProgressSection } from "@/src/components/in-progress-section/in-progress-section";
 import { TaskGroupsSection } from "@/src/components/task-groups-section/task-groups-section";
 
 import { useAddButtonHandler } from "@/src/navigation/add-button-context";
+import { useCreateCategoryMutation } from "@/src/rtk/categories-api-slice";
 import { useTheme } from "@/src/theme";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
@@ -13,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function HomeScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const [createCategory] = useCreateCategoryMutation();
 
   const [isCreateCategoryVisible, setCreateCategoryVisible] = useState(false);
 
@@ -20,8 +22,9 @@ export default function HomeScreen() {
     setCreateCategoryVisible(true);
   });
 
-  const handleCreateCategory = (name: string) => {
+  const handleCreateCategory = async (name: string) => {
     // TODO: call the real create-category mutation once it exists on
+    await createCategory({ name: name }).unwrap();
     console.log("create category:", name);
     setCreateCategoryVisible(false);
   };
@@ -39,13 +42,6 @@ export default function HomeScreen() {
       title: "Uber Eats redesign challenge",
     },
     { id: "3", category: "Office Project", title: "Onboarding flow revamp" },
-  ];
-
-  // TODO: replace with real data from the categories API once it exists.
-  const PLACEHOLDER_TASK_GROUPS = [
-    { id: "1", name: "Office Project", taskCount: 23 },
-    { id: "2", name: "Personal Project", taskCount: 30 },
-    { id: "3", name: "Daily Study", taskCount: 30 },
   ];
 
   return (
@@ -73,11 +69,12 @@ export default function HomeScreen() {
         </View>
 
         <View style={{ marginTop: theme.spacing[24] }}>
-          <TaskGroupsSection groups={PLACEHOLDER_TASK_GROUPS} />
+          <TaskGroupsSection />
         </View>
       </ScrollView>
 
-      <CreateCategoryDialog
+      <CategoryDialog
+        title="Add a Category"
         visible={isCreateCategoryVisible}
         onClose={() => setCreateCategoryVisible(false)}
         onSubmit={handleCreateCategory}

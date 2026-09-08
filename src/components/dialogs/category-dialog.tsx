@@ -5,19 +5,21 @@ import { useState } from "react";
 import { Modal, Pressable, Text, TextInput, View } from "react-native";
 import styles from "./category-dialog-styles";
 
-export interface CreateCategoryDialogProps {
+export interface CategoryDialogProps {
+  title: string;
   visible: boolean;
   onClose: () => void;
   onSubmit: (name: string) => void;
   submitting?: boolean;
 }
 
-export function CreateCategoryDialog({
+export function CategoryDialog({
+  title,
   visible,
   onClose,
   onSubmit,
   submitting = false,
-}: CreateCategoryDialogProps) {
+}: CategoryDialogProps) {
   const theme = useTheme();
   const [name, setName] = useState("");
 
@@ -28,9 +30,10 @@ export function CreateCategoryDialog({
     onClose();
   };
 
-  const handleAdd = () => {
+  const handleSubmit = () => {
     if (!trimmedName) return;
     onSubmit(trimmedName);
+    setName("");
   };
 
   return (
@@ -61,7 +64,7 @@ export function CreateCategoryDialog({
               { color: theme.colors.textPrimary },
             ]}
           >
-            Add Category
+            {title}
           </Text>
 
           <TextInput
@@ -71,7 +74,7 @@ export function CreateCategoryDialog({
             placeholderTextColor={theme.colors.textSecondary}
             autoFocus
             editable={!submitting}
-            onSubmitEditing={handleAdd}
+            onSubmitEditing={handleSubmit}
             returnKeyType="done"
             style={[
               theme.typography.body,
@@ -95,7 +98,7 @@ export function CreateCategoryDialog({
             <View style={styles.buttonSlot}>
               <PrimaryButton
                 label="Add"
-                onPress={handleAdd}
+                onPress={handleSubmit}
                 loading={submitting}
                 disabled={!trimmedName}
               />

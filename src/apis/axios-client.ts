@@ -24,7 +24,7 @@ type AuthTokenGetter = () =>
   | Promise<string | null | undefined>;
 
 let getAuthToken: AuthTokenGetter = () =>
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNyIsImV4cCI6MTc4ODcxNzg1Mn0.jO52cbRBysgbGjEuGPyRGpBjm01YheTKYUR14vo0YNg";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNyIsImV4cCI6MTc4ODg3NTIzM30.OpbsYHsFQ5pxw7WLfUzLC6yP8FSDTmRU3yfDa_7JC7E";
 
 export function setAuthTokenGetter(getter: AuthTokenGetter): void {
   getAuthToken = getter;
@@ -135,7 +135,10 @@ axiosClient.interceptors.request.use(
 );
 
 axiosClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(response);
+    return response;
+  },
   (error: AxiosError<Partial<ApiErrorPayload>>) => {
     const apiError = toApiError(error);
 
