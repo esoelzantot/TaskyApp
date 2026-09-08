@@ -26,6 +26,11 @@ export function ScreenHeader({
   const arrowIcon =
     mode !== "dark" ? AppAssets.ARROW_LIGHT_ICON : AppAssets.ARROW_DARK_ICON;
 
+  const notificationIcon =
+    mode !== "dark"
+      ? AppAssets.NOTIFICATION_LIGHT_ICON
+      : AppAssets.NOTIFICATION_DARK_ICON;
+
   return (
     <View
       style={[
@@ -68,7 +73,7 @@ export function ScreenHeader({
         style={[styles.sideSlot, styles.bellSlot]}
       >
         <Image
-          source={AppAssets.NOTIFICATION_ICON}
+          source={notificationIcon}
           style={styles.bellIcon}
           resizeMode="contain"
         />

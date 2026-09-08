@@ -1,3 +1,4 @@
+import { categoriesApiSlice } from "@/src/rtk/categories-api-slice";
 import {
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,
@@ -8,7 +9,6 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { Provider as ReduxProvider } from "react-redux";
-import { categoriesApiSlice } from "@/src/rtk/categories-api-slice";
 
 import { setupRtkQueryListeners } from "@/src/rtk/setup-listeners";
 import { persistor, store } from "@/src/rtk/store";
@@ -51,10 +51,6 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="add-task" options={{ headerShown: false }} />
         <Stack.Screen name="edit-task/[id]" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="category-tasks/[id]"
-          options={{ headerShown: false }}
-        />
       </Stack>
       <StatusBar style={mode === "dark" ? "light" : "dark"} />
     </NavigationThemeProvider>
@@ -83,9 +79,9 @@ export default function RootLayout() {
 
   useEffect(() => setupRtkQueryListeners(store), []);
 
-    useEffect(() => {
-      store.dispatch(categoriesApiSlice.endpoints.getCategories.initiate());
-    }, []);
+  useEffect(() => {
+    store.dispatch(categoriesApiSlice.endpoints.getCategories.initiate());
+  }, []);
 
   const appReady = fontsLoaded && persistReady;
 

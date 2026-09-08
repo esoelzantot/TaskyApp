@@ -5,9 +5,8 @@ import styles from "./bottom-tab-bar-styles";
 
 import AppAssets from "@/src/constants/app-assets";
 import { useTheme } from "@/src/theme";
-import { router } from "expo-router";
 
-/** Route name → its icon. Add an entry here for every tab this bar renders. */
+/** Route name → its icon. Add an entry here for every VISIBLE tab this bar renders. */
 const ICON_BY_ROUTE_NAME: Record<string, number> = {
   index: AppAssets.HOME_ICON,
   calendar: AppAssets.CALENDAR_ICON,
@@ -18,6 +17,10 @@ const ICON_BY_ROUTE_NAME: Record<string, number> = {
 const FAB_SIZE = 64;
 
 export interface BottomTabBarWithFabProps extends BottomTabBarProps {
+  /**
+   * Called when the floating center button is pressed. This bar has
+   * no idea what that press should do.
+   */
   onAddPress?: () => void;
 }
 
@@ -29,14 +32,11 @@ export function BottomTabBar({
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
-  const renderTabIcon = (
-    route: (typeof state.routes)[number],
-    index: number,
-  ) => {
+  const renderTabIcon = (route: (typeof state.routes)[number]) => {
     const icon = ICON_BY_ROUTE_NAME[route.name];
     if (!icon) return null;
-
-    const isFocused = state.index === index;
+    const routeIndex = state.routes.indexOf(route);
+    const isFocused = state.index === routeIndex;
 
     const onPress = () => {
       const event = navigation.emit({
@@ -74,8 +74,11 @@ export function BottomTabBar({
     );
   };
 
-  const leftRoutes = state.routes.slice(0, 2);
-  const rightRoutes = state.routes.slice(2, 4);
+  const visibleRoutes = state.routes.filter(
+    (route) => route.name in ICON_BY_ROUTE_NAME,
+  );
+  const leftRoutes = visibleRoutes.slice(0, 2);
+  const rightRoutes = visibleRoutes.slice(2, 4);
 
   return (
     <View
@@ -96,35 +99,16 @@ export function BottomTabBar({
         ]}
       >
         <View style={styles.tabGroup}>
-          {leftRoutes.map((route, index) => renderTabIcon(route, index))}
+          {leftRoutes.map((route) => renderTabIcon(route))}
         </View>
         <View style={{ width: FAB_SIZE + theme.spacing[16] }} />
         <View style={styles.tabGroup}>
-          {rightRoutes.map((route, index) => renderTabIcon(route, index + 2))}
+          {rightRoutes.map((route) => renderTabIcon(route))}
         </View>
       </View>
 
       <Pressable
-        onPress={
-          () =>
-            router.push({
-              pathname: "/edit-task/[id]",
-              params: {
-                id: String(11),
-                categoryId: "42",
-                projectName: "Tasky App",
-                description:
-                  "Implement the new task management features in the app.",
-                dueDate: "2023-08-15",
-                priority: "High",
-                status: "Active",
-              },
-            })
-
-          // router.push({
-          //   pathname: "/add-task",
-          // })
-        }
+        onPress={onAddPress}
         style={[
           styles.fab,
           {

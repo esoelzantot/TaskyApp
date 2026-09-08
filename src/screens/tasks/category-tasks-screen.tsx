@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -8,6 +8,7 @@ import {
   TaskCardData,
   TaskCardStatus,
 } from "@/src/components/tasks/task-card";
+import { useAddButtonHandler } from "@/src/navigation/add-button-context";
 import { useTheme } from "@/src/theme";
 
 type FilterValue = "All" | TaskCardStatus;
@@ -20,28 +21,61 @@ const FILTER_TABS: { label: string; value: FilterValue }[] = [
 ];
 
 interface CategoryTasksScreenProps {
+  categoryId: string;
   name: string;
-  tasks: TaskCardData[];
-  onEditTask: (taskId: TaskCardData["id"]) => void;
-  onDeleteTask: (taskId: TaskCardData["id"]) => void;
-  onAddTask: () => void;
 }
 
 export function CategoryTasksScreen({
+  categoryId,
   name,
-  tasks,
-  onEditTask,
-  onDeleteTask,
-  onAddTask,
 }: CategoryTasksScreenProps) {
-  const { colors, typography, spacing, radii, elevation } = useTheme();
+  const { colors, typography, spacing, radii } = useTheme();
+  const router = useRouter();
   const [filter, setFilter] = useState<FilterValue>("All");
+
+  // TODO: replace with the real tasks-api-slice hook once confirmed —
+  const tasks: TaskCardData[] = [];
 
   const filteredTasks = useMemo(
     () =>
       filter === "All" ? tasks : tasks.filter((task) => task.status === filter),
     [tasks, filter],
   );
+
+  // The FAB (see BottomTabBar) has no idea this screen exists — this
+  // registers what it should do while THIS screen is focused, and
+  // un-registers automatically on blur.
+  useAddButtonHandler(() => {
+    router.push({
+      pathname: "/edit-task/[id]",
+      params: {
+        id: "2",
+        taskId: "2",
+        categoryId: "42",
+        categoryName: "gig program",
+        projectName: "Tasky App",
+        description: "Graduate project for the GIG program",
+        dueDate: "12-08-2024",
+        priority: "High",
+        status: "Active",
+      },
+    });
+  });
+
+  const handleEditTask = (taskId: TaskCardData["id"]) => {
+    // TODO: fill in the rest of EditTaskParams from the real task
+    // object once TaskCardData's shape is confirmed.
+    router.push({
+      pathname: "/edit-task/[id]",
+      params: { id: String(taskId), categoryId },
+    });
+  };
+
+  const handleDeleteTask = (taskId: TaskCardData["id"]) => {
+    // TODO: call the real delete mutation (e.g. useDeleteTaskMutation)
+    // once tasks-api-slice.ts is confirmed.
+    console.log("delete task", taskId);
+  };
 
   return (
     <View style={[styles.flex, { backgroundColor: colors.background }]}>
@@ -103,27 +137,12 @@ export function CategoryTasksScreen({
           >
             <TaskCard
               {...task}
-              onEdit={() => onEditTask(task.id)}
-              onDelete={() => onDeleteTask(task.id)}
+              onEdit={() => handleEditTask(task.id)}
+              onDelete={() => handleDeleteTask(task.id)}
             />
           </View>
         ))}
       </ScrollView>
-
-      <Pressable
-        onPress={onAddTask}
-        style={[
-          styles.fab,
-          {
-            backgroundColor: colors.primary,
-            borderRadius: radii.full,
-            bottom: spacing[24],
-          },
-          elevation.level2,
-        ]}
-      >
-        <Ionicons name="add" size={28} color={colors.onPrimary} />
-      </Pressable>
     </View>
   );
 }
@@ -146,14 +165,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tab: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  fab: {
-    position: "absolute",
-    alignSelf: "center",
-    width: 56,
-    height: 56,
     alignItems: "center",
     justifyContent: "center",
   },

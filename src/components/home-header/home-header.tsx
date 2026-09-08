@@ -1,5 +1,5 @@
 import AppAssets from "@/src/constants/app-assets";
-import { useTheme } from "@/src/theme";
+import { useTheme, useThemeMode } from "@/src/theme";
 import { Image, Pressable, Text, View } from "react-native";
 import styles from "./home-header-styles";
 
@@ -17,6 +17,12 @@ export function HomeHeader({
   onNotificationPress,
 }: HomeHeaderProps) {
   const theme = useTheme();
+  const { mode } = useThemeMode();
+
+  const notificationIcon =
+    mode !== "dark"
+      ? AppAssets.NOTIFICATION_LIGHT_ICON
+      : AppAssets.NOTIFICATION_DARK_ICON;
 
   return (
     <View style={styles.row}>
@@ -69,7 +75,7 @@ export function HomeHeader({
         style={styles.bellButton}
       >
         <Image
-          source={AppAssets.NOTIFICATION_ICON}
+          source={notificationIcon}
           style={styles.bellIcon}
           resizeMode="contain"
         />
