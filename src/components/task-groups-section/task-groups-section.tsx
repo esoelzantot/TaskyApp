@@ -100,9 +100,23 @@ export function TaskGroupsSection({
           return (
             <Pressable
               onPress={() =>
+                // router.push({
+                //   pathname: "/category-tasks/[id]",
+                //   params: { id: String(42), name: "GIG Program" },
+                // })
+
                 router.push({
-                  pathname: "/category-tasks/[id]",
-                  params: { id: String(42), name: "GIG Program" },
+                  pathname: "/task/[id]" as any,
+                  params: {
+                    id: "2",
+                    categoryId: "42",
+                    projectName: "Ticket Creation",
+                    description:
+                      "Open the Order List section of the DR sheet, add the remaining waybills next to the Waybills column, filter for duplicates, and delete them.",
+                    dueDate: "01/01/2024",
+                    priority: "High",
+                    status: "Completed",
+                  },
                 })
               }
               style={[

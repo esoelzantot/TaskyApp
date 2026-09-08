@@ -42,23 +42,10 @@ export function CategoryTasksScreen({
     [tasks, filter],
   );
 
-  // The FAB (see BottomTabBar) has no idea this screen exists — this
-  // registers what it should do while THIS screen is focused, and
-  // un-registers automatically on blur.
   useAddButtonHandler(() => {
     router.push({
-      pathname: "/edit-task/[id]",
-      params: {
-        id: "2",
-        taskId: "2",
-        categoryId: "42",
-        categoryName: "gig program",
-        projectName: "Tasky App",
-        description: "Graduate project for the GIG program",
-        dueDate: "12-08-2024",
-        priority: "High",
-        status: "Active",
-      },
+      pathname: "/add-task",
+      params: { categoryId },
     });
   });
 
