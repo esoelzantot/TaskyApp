@@ -91,13 +91,37 @@ function toApiError(error: AxiosError<Partial<ApiErrorPayload>>): ApiError {
   }
 
   const { status, data } = error.response;
-  const message =
-    (data &&
-      typeof data === "object" &&
-      typeof data.message === "string" &&
-      data.message) ||
-    error.message ||
-    "Something went wrong. Please try again.";
+
+  // Handle FastAPI 422 validation errors: { detail: [{ msg, loc, ... }] }
+  let message: string;
+  if (
+    status === 422 &&
+    data &&
+    typeof data === "object" &&
+    "detail" in data &&
+    Array.isArray((data as any).detail)
+  ) {
+    const details = (data as any).detail as Array<{ msg?: string; loc?: unknown[] }>;
+    message = details
+      .map((d) => d.msg || "Validation error")
+      .join(". ");
+  } else if (
+    data &&
+    typeof data === "object" &&
+    "detail" in data &&
+    typeof (data as any).detail === "string"
+  ) {
+    // FastAPI string detail: { detail: "Invalid credentials" }
+    message = (data as any).detail;
+  } else {
+    message =
+      (data &&
+        typeof data === "object" &&
+        typeof data.message === "string" &&
+        data.message) ||
+      error.message ||
+      "Something went wrong. Please try again.";
+  }
 
   return new ApiError(message, {
     status,

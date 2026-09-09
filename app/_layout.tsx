@@ -21,9 +21,8 @@ import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync();
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
+// anchor removed so the app starts at index.tsx (splash screen)
+// instead of jumping directly to (tabs)
 
 function RootNavigator() {
   const { mode } = useThemeMode();
@@ -47,6 +46,8 @@ function RootNavigator() {
   return (
     <NavigationThemeProvider value={navigationTheme}>
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={mode === "dark" ? "light" : "dark"} />
