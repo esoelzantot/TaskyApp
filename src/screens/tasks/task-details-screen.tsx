@@ -1,69 +1,109 @@
 import { ScreenHeader } from "@/src/components/screen-header/screen-header";
 import { DangerButton } from "@/src/components/tasks/danger-button";
 import { PrimaryButton } from "@/src/components/tasks/primary-button";
-import type {
-  EditTaskFormValues,
-  Priority,
-  TaskStatus,
-} from "@/src/models/task";
-import { useTheme, useThemeMode } from "@/src/theme";
+import { formatDate } from "@/src/helpers/format-date";
+import type { Priority, Task } from "@/src/models/task";
+import {
+  useDeleteTaskMutation,
+  useUpdateTaskMutation,
+} from "@/src/rtk/tasks-api-slice";
+import { useTheme } from "@/src/theme";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { router } from "expo-router";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import styles from "./task-details-styles";
 
 export interface TaskDetailsScreenProps {
-  task: EditTaskFormValues;
-  /** Remote profile picture URL — falls back to an initial-letter avatar when omitted. */
-  userAvatarUri?: string;
-  onToggleComplete: () => void;
-  onEditPress: () => void;
-  onDeletePress: () => void;
+  task: Task;
 }
 
-/**
- * Not a distinct swatch in the Figma Design System — only "High"
- * (Accent Orange) is shown in the reference. Medium/Low reuse the
- * other existing semantic tokens (info blue / success green) rather
- * than inventing new colors.
- */
 function getPriorityStyle(
   colors: ReturnType<typeof useTheme>["colors"],
   priority: Priority,
 ) {
-  switch (priority) {
-    case "High":
+  switch (priority.toUpperCase()) {
+    case "High".toUpperCase():
       return {
         backgroundColor: colors.accentOrangeLight,
         color: colors.accentOrange,
       };
-    case "Medium":
+    case "Medium".toUpperCase():
       return {
         backgroundColor: colors.accentBlueLight,
         color: colors.accentBlue,
       };
-    case "Low":
+    case "Low".toUpperCase():
       return { backgroundColor: colors.success, color: colors.onSuccess };
   }
 }
 
-export function TaskDetailsScreen({
-  task,
-  userAvatarUri,
-  onToggleComplete,
-  onEditPress,
-  onDeletePress,
-}: TaskDetailsScreenProps) {
+export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
   const theme = useTheme();
-  const { mode } = useThemeMode();
-  const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [updateTask, { isLoading: isToggling }] = useUpdateTaskMutation();
+  const [deleteTask] = useDeleteTaskMutation();
 
-  const isCompleted: boolean =
-    task.status === ("Completed" satisfies TaskStatus);
   const priorityStyle = getPriorityStyle(theme.colors, task.priority);
+
+  const handleToggleComplete = () => {
+    updateTask({
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      due_date: task.due_date,
+      priority: task.priority,
+      category_id: task.category_id,
+      completed: !task.completed,
+    })
+      .unwrap()
+      .catch(() => {
+        Alert.alert(
+          "Something went wrong",
+          "Couldn't update this task. Please try again.",
+        );
+      });
+  };
+
+  const handleEditPress = () => {
+    router.push({
+      pathname: "/edit-task/[id]",
+      params: {
+        id: String(task.id),
+        categoryId: String(task.category_id),
+        projectName: task.title,
+        description: task.description,
+        dueDate: task.due_date,
+        priority: task.priority,
+        status: task.completed ? "Completed" : "Active",
+      },
+    });
+  };
+
+  const handleDeletePress = () => {
+    Alert.alert(
+      "Delete Task",
+      `Delete "${task.title}"? This can't be undone.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteTask(task.id)
+              .unwrap()
+              .then(() => router.back())
+              .catch(() => {
+                Alert.alert(
+                  "Something went wrong",
+                  "Couldn't delete this task. Please try again.",
+                );
+              });
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <View style={[styles.flex, { backgroundColor: theme.colors.background }]}>
@@ -106,7 +146,7 @@ export function TaskDetailsScreen({
                   { color: theme.colors.primary },
                 ]}
               >
-                {task.categoryName}
+                {task.category_name}
               </Text>
             </View>
 
@@ -123,21 +163,23 @@ export function TaskDetailsScreen({
                 Completed
               </Text>
               <Pressable
-                onPress={onToggleComplete}
+                onPress={handleToggleComplete}
+                disabled={isToggling}
                 hitSlop={8}
                 style={[
                   styles.checkbox,
                   {
                     borderRadius: theme.radii.sm,
-                    backgroundColor: isCompleted
+                    backgroundColor: task.completed
                       ? theme.colors.primary
                       : "transparent",
-                    borderWidth: isCompleted ? 0 : 2,
+                    borderWidth: task.completed ? 0 : 2,
                     borderColor: theme.colors.border,
+                    opacity: isToggling ? 0.6 : 1,
                   },
                 ]}
               >
-                {isCompleted && (
+                {task.completed && (
                   <MaterialIcons
                     name="check"
                     size={18}
@@ -166,7 +208,7 @@ export function TaskDetailsScreen({
                 },
               ]}
             >
-              {task.projectName}
+              {task.title}
             </Text>
           </View>
 
@@ -237,7 +279,7 @@ export function TaskDetailsScreen({
                     { color: theme.colors.textPrimary },
                   ]}
                 >
-                  {String(task.dueDate)}
+                  {formatDate(new Date(task.due_date))}
                 </Text>
               </View>
             </View>
@@ -283,10 +325,10 @@ export function TaskDetailsScreen({
           ]}
         >
           <View style={styles.buttonSlot}>
-            <PrimaryButton label="Edit Task" onPress={onEditPress} />
+            <PrimaryButton label="Edit Task" onPress={handleEditPress} />
           </View>
           <View style={styles.buttonSlot}>
-            <DangerButton label="Delete" onPress={onDeletePress} />
+            <DangerButton label="Delete" onPress={handleDeletePress} />
           </View>
         </View>
       </ScrollView>

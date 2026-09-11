@@ -1,12 +1,14 @@
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
-import type {
-  EditTaskFormValues,
-  Priority,
-  TaskStatus,
+import {
+  toUpdateTaskRequest,
+  type EditTaskFormValues,
+  type Priority,
+  type TaskStatus,
 } from "@/src/models/task";
 import { useGetCategoriesQuery } from "@/src/rtk/categories-api-slice";
+import { useUpdateTaskMutation } from "@/src/rtk/tasks-api-slice";
 import { EditTaskScreen } from "@/src/screens/tasks/edit-task-screen";
 
 /** Everything the caller passes via `router.push` (see usage example below). All route params arrive as strings. */
@@ -22,6 +24,8 @@ interface EditTaskParams {
 
 export default function EditTaskRoute() {
   const params = useLocalSearchParams() as Partial<EditTaskParams>;
+
+  const [updateTask] = useUpdateTaskMutation();
 
   // Loads the categories list so we can resolve `categoryId` -> the group's
   // display name (the screen's dropdown needs both).
@@ -46,15 +50,13 @@ export default function EditTaskRoute() {
     status: (params.status as TaskStatus) ?? "Active",
   };
 
-  const handleSubmit = (values: EditTaskFormValues) => {
-    // TODO: wire to an `updateTask` mutation (ApiEndpoints.UPDATE_TASK_BY_ID)
-    // once the request body shape is confirmed.
+  const handleSubmit = async (values: EditTaskFormValues) => {
+    await updateTask(toUpdateTaskRequest(values)).unwrap();
     console.log("Edit Project submitted:", values);
     router.back();
   };
 
-  // Wait for categories to load before rendering, so the Task Group
-  // dropdown already shows the right selection instead of flashing empty.
+
   if (categoriesLoading) {
     return null;
   }

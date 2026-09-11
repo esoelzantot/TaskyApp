@@ -1,6 +1,12 @@
 import { useFocusEffect } from "expo-router/react-navigation";
 import type { ReactNode } from "react";
-import { createContext, useCallback, useContext, useRef } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 
 type AddButtonHandler = () => void;
 
@@ -51,18 +57,19 @@ export function useAddButtonTrigger(): AddButtonHandler {
   return useAddButtonContext().triggerAdd;
 }
 
-/**
- * Call from any screen to control what happens when the FAB is
- * pressed while that screen is focused/visible.
- */
 export function useAddButtonHandler(handler: AddButtonHandler): void {
   const { setAddButtonHandler } = useAddButtonContext();
 
+  const handlerRef = useRef(handler);
+  useEffect(() => {
+    handlerRef.current = handler;
+  }, [handler]);
+
   useFocusEffect(
     useCallback(() => {
-      setAddButtonHandler(handler);
+      setAddButtonHandler(() => handlerRef.current());
       return () => setAddButtonHandler(null);
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [handler]),
+    }, []),
   );
 }

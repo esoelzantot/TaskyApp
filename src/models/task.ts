@@ -1,6 +1,6 @@
 import type { Category } from "./category";
 
-/** The only three priority levels the Add Task screen allows. */
+/** The only three priority levels the Add/Edit Task screens allow. */
 export type Priority = "Low" | "Medium" | "High";
 
 export const PRIORITIES: readonly Priority[] = ["Low", "Medium", "High"];
@@ -10,7 +10,6 @@ export type TaskStatus = "Active" | "Completed";
 
 export const TASK_STATUSES: readonly TaskStatus[] = ["Active", "Completed"];
 
-// TYPES AND HELPERS
 export interface AddTaskFormValues {
   categoryId: Category["id"];
   categoryName: string;
@@ -31,6 +30,22 @@ export interface EditTaskFormValues {
   status: TaskStatus;
 }
 
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  due_date: string;
+  priority: Priority;
+  completed: boolean;
+  category_id: number;
+  category_name: string;
+}
+
+export interface GetTasksParams {
+  priority?: Priority;
+  category_id?: number;
+}
+
 export interface CreateTaskRequest {
   title: string;
   description: string;
@@ -39,16 +54,17 @@ export interface CreateTaskRequest {
   category_id: number;
 }
 
-export interface EditTaskRequest {
+export interface UpdateTaskRequest {
+  id: Task["id"];
   title: string;
   description: string;
   due_date: string;
   priority: Priority;
-  category_id: number;
   completed: boolean;
+  category_id: number;
 }
 
-/** Formats a `Date` as the "YYYY-MM-DD" */
+/** Formats a `Date` as the "YYYY-MM-DD" string the API expects, in local time. */
 export function formatDueDate(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -69,13 +85,17 @@ export function toCreateTaskRequest(
   };
 }
 
-export function toEditTaskRequest(values: EditTaskFormValues): EditTaskRequest {
+/** Maps the Edit Task screen's form values to the `PUT /tasks/{task_id}` request body. */
+export function toUpdateTaskRequest(
+  values: EditTaskFormValues,
+): UpdateTaskRequest {
   return {
+    id: Number(values.taskId),
     title: values.projectName,
     description: values.description,
     due_date: formatDueDate(values.dueDate),
     priority: values.priority,
+    completed: values.status === "Completed",
     category_id: Number(values.categoryId),
-    completed: values.status === "Completed" ? true : false,
   };
 }

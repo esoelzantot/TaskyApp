@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
-  DateTimePickerEvent,
+    DateTimePickerChangeEvent,
 } from "@react-native-community/datetimepicker";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/src/theme";
@@ -36,15 +36,21 @@ export function DateField({
   const { colors, typography, spacing } = useTheme();
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  const handleChange = (event: DateTimePickerEvent, selected?: Date) => {
+  const handleValueChange = (
+    event: DateTimePickerChangeEvent,
+    selected: Date,
+  ) => {
     if (Platform.OS === "android") {
       setPickerOpen(false);
     }
-    if (event.type === "dismissed" || !selected) return;
     onChange(selected);
     if (Platform.OS === "ios") {
       setPickerOpen(false);
     }
+  };
+
+  const handleDismiss = () => {
+    setPickerOpen(false);
   };
 
   return (
@@ -85,7 +91,8 @@ export function DateField({
           mode="date"
           display={Platform.OS === "ios" ? "inline" : "default"}
           minimumDate={minimumDate}
-          onValueChange={() => handleChange}
+          onValueChange={handleValueChange}
+          onDismiss={handleDismiss}
         />
       )}
     </FieldCard>
