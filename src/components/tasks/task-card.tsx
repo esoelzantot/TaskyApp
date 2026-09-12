@@ -2,13 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { DangerButton } from "@/src/components/tasks/danger-button";
 import { FieldCard } from "@/src/components/tasks/field-card";
-import { IconBubble } from "@/src/components/tasks/icon-bubble";
-import { PrimaryButton } from "@/src/components/tasks/primary-button";
 import { formatDate } from "@/src/helpers/format-date";
 import type { Task } from "@/src/models/task";
-import { useDeleteTaskMutation } from "@/src/rtk/tasks-api-slice";
+import { useUpdateTaskMutation } from "@/src/rtk/tasks-api-slice";
 import { useTheme } from "@/src/theme";
 
 export type TaskCardStatus = "To-do" | "Done";
@@ -21,7 +18,7 @@ interface TaskCardProps {
 
 export function TaskCard({ task }: TaskCardProps) {
   const { colors, typography, spacing, radii } = useTheme();
-  const [deleteTask] = useDeleteTaskMutation();
+  const [updateTask, { isLoading: isToggling }] = useUpdateTaskMutation();
 
   const status: TaskCardStatus = task.completed ? "Done" : "To-do";
   const statusColors: Record<TaskCardStatus, { bg: string; text: string }> = {
@@ -30,84 +27,92 @@ export function TaskCard({ task }: TaskCardProps) {
   };
   const statusStyle = statusColors[status];
 
-  const handleEdit = () => {
+  const handlePress = () => {
     router.push({
-      pathname: "/edit-task/[id]",
-      params: {
-        id: String(task.id),
-        categoryId: String(task.category_id),
-        projectName: task.title,
-        description: task.description,
-        dueDate: task.due_date,
-        priority: task.priority,
-        status: task.completed ? "Completed" : "Active",
-      },
+      pathname: "/task/[id]",
+      params: { id: String(task.id) },
     });
   };
 
-  const handleDelete = () => {
-    Alert.alert(
-      "Delete Task",
-      `Delete "${task.title}"? This can't be undone.`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            deleteTask(task.id)
-              .unwrap()
-              .catch(() => {
-                Alert.alert(
-                  "Something went wrong",
-                  "Couldn't delete this task. Please try again.",
-                );
-              });
-          },
-        },
-      ],
-    );
+  const handleToggleComplete = () => {
+    updateTask({
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      due_date: task.due_date,
+      priority: task.priority,
+      category_id: task.category_id,
+      completed: !task.completed,
+    })
+      .unwrap()
+      .catch(() => {
+        Alert.alert(
+          "Something went wrong",
+          "Couldn't update this task. Please try again.",
+        );
+      });
   };
 
   return (
-    <Pressable
-      onPress={() => {
-        router.push({
-          pathname: "/task/[id]",
-          params: { id: String(task.id) },
-        });
-      }}
-    >
+    <Pressable onPress={handlePress}>
       <FieldCard>
-        <View style={styles.headerRow}>
-          <View style={styles.headerText}>
+        <View style={styles.row}>
+          <Pressable
+            onPress={handleToggleComplete}
+            disabled={isToggling}
+            hitSlop={8}
+            style={[
+              styles.checkbox,
+              {
+                borderRadius: radii.full,
+                borderWidth: task.completed ? 0 : 2,
+                borderColor: colors.primary,
+                backgroundColor: task.completed
+                  ? colors.primary
+                  : "transparent",
+                opacity: isToggling ? 0.6 : 1,
+              },
+            ]}
+          >
+            {task.completed && (
+              <Ionicons name="checkmark" size={16} color={colors.onPrimary} />
+            )}
+          </Pressable>
+
+          <View style={[styles.content, { marginLeft: spacing[12] }]}>
             <Text style={[typography.caption, { color: colors.textSecondary }]}>
               {task.category_name}
             </Text>
             <Text
               style={[
                 typography.heading2,
-                { color: colors.textPrimary, marginTop: spacing[2] },
+                {
+                  color: task.completed
+                    ? colors.textSecondary
+                    : colors.textPrimary,
+                  marginTop: spacing[2],
+                  textDecorationLine: task.completed ? "line-through" : "none",
+                },
               ]}
             >
               {task.title}
             </Text>
-          </View>
-        </View>
 
-        <View style={[styles.metaRow, { marginTop: spacing[16] }]}>
-          <View style={styles.timeGroup}>
-            <IconBubble backgroundColor={colors.primarySurface} size={28}>
+            {/* NOTE: the reference design shows a time ("04:00 PM") alongside
+                the date, but the API's `due_date` is a date-only string with
+                no time component — showing the date only until/unless a time
+                field exists. */}
+            <View style={[styles.timeRow, { marginTop: spacing[6] }]}>
               <Ionicons name="time-outline" size={14} color={colors.primary} />
-            </IconBubble>
-            <Text
-              style={[
-                typography.bodyBold,
-                { color: colors.primary, marginLeft: spacing[8] },
-              ]}
-            >
-              {formatDate(new Date(task.due_date))}
-            </Text>
+              <Text
+                style={[
+                  typography.body,
+                  { color: colors.primary, marginLeft: spacing[4] },
+                ]}
+              >
+                {formatDate(new Date(task.due_date))}
+              </Text>
+            </View>
           </View>
 
           <View
@@ -122,17 +127,8 @@ export function TaskCard({ task }: TaskCardProps) {
             ]}
           >
             <Text style={[typography.bodyBold, { color: statusStyle.text }]}>
-              {status}
+              {status === "To-do" ? "To Do" : status}
             </Text>
-          </View>
-        </View>
-
-        <View style={[styles.buttonRow, { marginTop: spacing[16] }]}>
-          <View style={[styles.buttonSlot, { marginRight: spacing[8] }]}>
-            <PrimaryButton label="Edit" onPress={handleEdit} />
-          </View>
-          <View style={[styles.buttonSlot, { marginLeft: spacing[8] }]}>
-            <DangerButton label="Delete" onPress={handleDelete} />
           </View>
         </View>
       </FieldCard>
@@ -141,29 +137,25 @@ export function TaskCard({ task }: TaskCardProps) {
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
+  row: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "flex-start",
   },
-  headerText: {
-    flex: 1,
-    paddingRight: 12,
+  checkbox: {
+    width: 26,
+    height: 26,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
   },
-  metaRow: {
+  content: {
+    flex: 1,
+  },
+  timeRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
   },
-  timeGroup: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  statusPill: {},
-  buttonRow: {
-    flexDirection: "row",
-  },
-  buttonSlot: {
-    flex: 1,
+  statusPill: {
+    alignSelf: "flex-start",
   },
 });

@@ -24,7 +24,7 @@ type AuthTokenGetter = () =>
   | Promise<string | null | undefined>;
 
 let getAuthToken: AuthTokenGetter = () =>
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNyIsImV4cCI6MTc4OTE2NzUzOX0.hW_OwElrSz5aad9H3TIiRJItJOkT6qBLZdvoR-SvaF4";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNyIsImV4cCI6MTc4OTE5NzU0NX0.UdGPnNBX8Z9vn-eGzGGQj0RWfyzLGF0sLI9Oo7nF0YY";
 
 export function setAuthTokenGetter(getter: AuthTokenGetter): void {
   getAuthToken = getter;

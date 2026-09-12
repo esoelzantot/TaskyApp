@@ -3,9 +3,9 @@ import { StyleSheet, View } from "react-native";
 import { useTheme } from "@/src/theme";
 import { ShimmerBar, withAlpha } from "@/src/utils/shimmer-bar";
 
-const PLACEHOLDER_COUNT = 4;
+const PLACEHOLDER_COUNT = 5;
 
-/** One placeholder card — mirrors TaskCard's header/meta/buttons layout. */
+/** One placeholder row — mirrors TaskCard's checkbox + title/date + status pill layout. */
 function TaskCardSkeleton() {
   const { colors, spacing, radii, elevation } = useTheme();
 
@@ -24,60 +24,42 @@ function TaskCardSkeleton() {
         elevation.level1,
       ]}
     >
-      <View style={styles.headerRow}>
-        <View style={styles.headerText}>
+      <View style={styles.row}>
+        <ShimmerBar
+          width={26}
+          height={26}
+          radius={radii.full}
+          baseColor={baseColor}
+          highlightColor={highlightColor}
+        />
+
+        <View style={[styles.content, { marginLeft: spacing[12] }]}>
           <ShimmerBar
-            width="40%"
+            width="35%"
             height={10}
             baseColor={baseColor}
             highlightColor={highlightColor}
           />
           <View style={{ height: spacing[8] }} />
           <ShimmerBar
-            width="70%"
+            width="65%"
             height={18}
             baseColor={baseColor}
             highlightColor={highlightColor}
           />
+          <View style={{ height: spacing[8] }} />
+          <ShimmerBar
+            width={90}
+            height={12}
+            baseColor={baseColor}
+            highlightColor={highlightColor}
+          />
         </View>
-        <ShimmerBar
-          width={44}
-          height={44}
-          radius={radii.md}
-          baseColor={baseColor}
-          highlightColor={highlightColor}
-        />
-      </View>
 
-      <View style={[styles.metaRow, { marginTop: spacing[16] }]}>
         <ShimmerBar
-          width={110}
-          height={28}
+          width={64}
+          height={22}
           radius={radii.full}
-          baseColor={baseColor}
-          highlightColor={highlightColor}
-        />
-        <ShimmerBar
-          width={70}
-          height={24}
-          radius={radii.full}
-          baseColor={baseColor}
-          highlightColor={highlightColor}
-        />
-      </View>
-
-      <View style={[styles.buttonRow, { marginTop: spacing[16] }]}>
-        <ShimmerBar
-          width="47%"
-          height={44}
-          radius={radii.button}
-          baseColor={baseColor}
-          highlightColor={highlightColor}
-        />
-        <ShimmerBar
-          width="47%"
-          height={44}
-          radius={radii.button}
           baseColor={baseColor}
           highlightColor={highlightColor}
         />
@@ -103,22 +85,11 @@ const styles = StyleSheet.create({
   card: {
     width: "100%",
   },
-  headerRow: {
+  row: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "flex-start",
   },
-  headerText: {
+  content: {
     flex: 1,
-    paddingRight: 12,
-  },
-  metaRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
   },
 });

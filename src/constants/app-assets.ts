@@ -8,6 +8,12 @@ abstract class AppAssets {
   static readonly ADD_ICON = require("../../assets/images/add.png");
   static readonly ARROW_LIGHT_ICON = require("../../assets/images/arrow_light.png");
   static readonly ARROW_DARK_ICON = require("../../assets/images/arrow_dark.png");
+
+  // THEME ICONS
+  static readonly SUN_DARK_ICON = require("../../assets/images/sun-dark.png");
+  static readonly SUN_LIGHT_ICON = require("../../assets/images/sun-light.png");
+  static readonly MOON_DARK_ICON = require("../../assets/images/moon-dark.png");
+  static readonly MOON_LIGHT_ICON = require("../../assets/images/moon-light.png");
 }
 
 export default AppAssets;

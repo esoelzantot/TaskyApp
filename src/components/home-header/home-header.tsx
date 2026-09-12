@@ -17,12 +17,17 @@ export function HomeHeader({
   onNotificationPress,
 }: HomeHeaderProps) {
   const theme = useTheme();
-  const { mode } = useThemeMode();
+  const { mode, setMode } = useThemeMode();
+
+  const handleToggleTheme = () => setMode(mode === "dark" ? "light" : "dark");
 
   const notificationIcon =
     mode !== "dark"
       ? AppAssets.NOTIFICATION_LIGHT_ICON
       : AppAssets.NOTIFICATION_DARK_ICON;
+
+  const themeIcon =
+    mode !== "dark" ? AppAssets.MOON_LIGHT_ICON : AppAssets.SUN_DARK_ICON;
 
   return (
     <View style={styles.row}>
@@ -69,28 +74,46 @@ export function HomeHeader({
         </View>
       </View>
 
-      <Pressable
-        onPress={onNotificationPress}
-        hitSlop={12}
-        style={styles.bellButton}
-      >
-        <Image
-          source={notificationIcon}
-          style={styles.bellIcon}
-          resizeMode="contain"
-        />
-        {hasUnreadNotifications && (
-          <View
-            style={[
-              styles.badge,
-              {
-                backgroundColor: theme.colors.primary,
-                borderColor: theme.colors.background,
-              },
-            ]}
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Pressable
+          onPress={handleToggleTheme}
+          hitSlop={12}
+          style={[styles.bellButton, { marginRight: theme.spacing[12] }]}
+          accessibilityRole="button"
+          accessibilityLabel={
+            mode === "dark" ? "Switch to light mode" : "Switch to dark mode"
+          }
+        >
+          <Image
+            source={themeIcon}
+            style={styles.bellIcon}
+            resizeMode="contain"
           />
-        )}
-      </Pressable>
+        </Pressable>
+
+        <Pressable
+          onPress={onNotificationPress}
+          hitSlop={12}
+          style={styles.bellButton}
+        >
+          <Image
+            source={notificationIcon}
+            style={styles.bellIcon}
+            resizeMode="contain"
+          />
+          {hasUnreadNotifications && (
+            <View
+              style={[
+                styles.badge,
+                {
+                  backgroundColor: theme.colors.primary,
+                  borderColor: theme.colors.background,
+                },
+              ]}
+            />
+          )}
+        </Pressable>
+      </View>
     </View>
   );
 }
