@@ -10,17 +10,13 @@ import { useTheme } from "@/src/theme";
 const ICON_BY_ROUTE_NAME: Record<string, number> = {
   index: AppAssets.HOME_ICON,
   calendar: AppAssets.CALENDAR_ICON,
-  history: AppAssets.HISTORY_ICON,
+  completed: AppAssets.HISTORY_ICON,
   profile: AppAssets.PROFILE_ICON,
 };
 
 const FAB_SIZE = 64;
 
 export interface BottomTabBarWithFabProps extends BottomTabBarProps {
-  /**
-   * Called when the floating center button is pressed. This bar has
-   * no idea what that press should do.
-   */
   onAddPress?: () => void;
 }
 

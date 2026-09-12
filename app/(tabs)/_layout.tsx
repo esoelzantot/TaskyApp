@@ -1,14 +1,26 @@
 import { Tabs } from "expo-router";
 
-import { BottomTabBar } from "@/src/components/bottom-tab-bar/bottom-tab-bar";
+import {
+  BottomTabBar,
+  BottomTabBarWithFabProps,
+} from "@/src/components/bottom-tab-bar/bottom-tab-bar";
 import {
   AddButtonProvider,
   useAddButtonTrigger,
 } from "@/src/navigation/add-button-context";
 
-function TabBar(props: React.ComponentProps<typeof BottomTabBar>) {
+function TabBar(
+  props: Parameters<
+    NonNullable<React.ComponentProps<typeof Tabs>["tabBar"]>
+  >[0],
+) {
   const triggerAdd = useAddButtonTrigger();
-  return <BottomTabBar {...props} onAddPress={triggerAdd} />;
+  return (
+    <BottomTabBar
+      {...(props as unknown as BottomTabBarWithFabProps)}
+      onAddPress={triggerAdd}
+    />
+  );
 }
 
 export default function TabLayout() {
@@ -20,7 +32,7 @@ export default function TabLayout() {
       >
         <Tabs.Screen name="index" />
         <Tabs.Screen name="calendar" />
-        <Tabs.Screen name="history" />
+        <Tabs.Screen name="completed" />
         <Tabs.Screen name="profile" />
         {/* ===== HIDDEN SCREENS ===== */}
         <Tabs.Screen name="category-tasks/[id]" options={{ href: null }} />
