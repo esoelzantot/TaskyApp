@@ -22,6 +22,6 @@ export const api = createApi({
   refetchOnReconnect: true,
   refetchOnFocus: true,
   // Add tag names here as feature slices need them, e.g. ['Task', 'Category'].
-  tagTypes: [],
+  tagTypes: ["Planner"],
   endpoints: () => ({}),
 });
