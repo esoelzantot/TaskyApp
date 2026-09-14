@@ -33,7 +33,7 @@ export default function TabLayout() {
         <Tabs.Screen name="index" />
         <Tabs.Screen name="calendar" />
         <Tabs.Screen name="completed" />
-        <Tabs.Screen name="profile" />
+        <Tabs.Screen name="pomodoro" />
         {/* ===== HIDDEN SCREENS ===== */}
         <Tabs.Screen name="category-tasks/[id]" options={{ href: null }} />
       </Tabs>

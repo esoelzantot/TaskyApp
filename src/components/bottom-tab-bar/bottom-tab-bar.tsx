@@ -11,7 +11,7 @@ const ICON_BY_ROUTE_NAME: Record<string, number> = {
   index: AppAssets.HOME_ICON,
   calendar: AppAssets.CALENDAR_ICON,
   completed: AppAssets.HISTORY_ICON,
-  profile: AppAssets.PROFILE_ICON,
+  pomodoro: AppAssets.PROFILE_ICON,
 };
 
 const FAB_SIZE = 64;
