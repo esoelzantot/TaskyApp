@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ScreenHeader } from "@/src/components/screen-header/screen-header";
 import { SearchBar } from "@/src/components/search-bar";
 import { TaskCard, TaskCardStatus } from "@/src/components/tasks/task-card";
+import { TasksEmpty } from "@/src/components/tasks/tasks-empty";
 import { useAddButtonHandler } from "@/src/navigation/add-button-context";
 import { useGetTasksQuery } from "@/src/rtk/tasks-api-slice";
 import { useTheme } from "@/src/theme";
@@ -114,6 +115,8 @@ export function CategoryTasksScreen({
 
       {isLoading ? (
         <TasksSkeleton />
+      ) : filteredTasks.length === 0 ? (
+        <TasksEmpty />
       ) : (
         <ScrollView
           style={styles.listScroll}

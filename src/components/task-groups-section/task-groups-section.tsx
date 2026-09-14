@@ -21,7 +21,12 @@ export function TaskGroupsSection() {
   const { data: categories, isLoading } = useGetCategoriesQuery();
   const [search, setSearch] = useState("");
 
-  const groups: TaskGroup[] = (categories ?? []).map((category) => ({
+  // TEMP DEBUG — check this log, then tell me what it prints.
+  console.log("categories shape:", categories);
+
+  const categoriesArray = Array.isArray(categories) ? categories : [];
+
+  const groups: TaskGroup[] = categoriesArray.map((category) => ({
     id: String(category.id),
     name: category.name,
   }));

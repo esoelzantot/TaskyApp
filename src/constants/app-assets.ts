@@ -14,6 +14,10 @@ abstract class AppAssets {
   static readonly SUN_LIGHT_ICON = require("../../assets/images/sun-light.png");
   static readonly MOON_DARK_ICON = require("../../assets/images/moon-dark.png");
   static readonly MOON_LIGHT_ICON = require("../../assets/images/moon-light.png");
+
+  // EMPTY STATE GRAPHICS
+  static readonly EMPTY_TASKS_LIGHT_GRAPHIC = require("../../assets/images/empty-tasks-light.png");
+  static readonly EMPTY_TASKS_DARK_GRAPHIC = require("../../assets/images/empty-tasks-dark.png");
 }
 
 export default AppAssets;

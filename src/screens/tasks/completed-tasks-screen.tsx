@@ -8,6 +8,7 @@ import {
   CategoryFilterValue,
 } from "@/src/components/tasks/category-filter-dropdown";
 import { TaskCard } from "@/src/components/tasks/task-card";
+import { TasksEmpty } from "@/src/components/tasks/tasks-empty";
 import { useGetCompletedTasksQuery } from "@/src/rtk/tasks-api-slice";
 import { useTheme } from "@/src/theme";
 import { TasksSkeleton } from "@/src/utils/tasks-skeleton";
@@ -19,7 +20,6 @@ function CompletedTasksScreen() {
   const [categoryId, setCategoryId] = useState<CategoryFilterValue>("all");
 
   console.log("DATA", tasks);
-  
 
   const filteredTasks = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -53,6 +53,8 @@ function CompletedTasksScreen() {
 
       {isLoading ? (
         <TasksSkeleton />
+      ) : filteredTasks.length === 0 ? (
+        <TasksEmpty />
       ) : (
         <ScrollView
           style={styles.listScroll}
