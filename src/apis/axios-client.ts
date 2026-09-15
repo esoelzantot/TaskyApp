@@ -10,6 +10,7 @@ import {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from "axios";
+import { authStorage } from "../storage/auth";
 import ApiEndpoints from "./api-endpoints";
 
 const DEFAULT_TIMEOUT_MS = 30000;
@@ -23,7 +24,8 @@ type AuthTokenGetter = () =>
   | undefined
   | Promise<string | null | undefined>;
 
-let getAuthToken: AuthTokenGetter = () => null;
+let getAuthToken: AuthTokenGetter = async () => authStorage.getToken();
+
 
 export function setAuthTokenGetter(getter: AuthTokenGetter): void {
   getAuthToken = getter;
@@ -101,10 +103,11 @@ function toApiError(error: AxiosError<Partial<ApiErrorPayload>>): ApiError {
     "detail" in data &&
     Array.isArray((data as any).detail)
   ) {
-    const details = (data as any).detail as Array<{ msg?: string; loc?: unknown[] }>;
-    message = details
-      .map((d) => d.msg || "Validation error")
-      .join(". ");
+    const details = (data as any).detail as {
+      msg?: string;
+      loc?: unknown[];
+    }[];
+    message = details.map((d) => d.msg || "Validation error").join(". ");
   } else if (
     data &&
     typeof data === "object" &&
@@ -158,7 +161,10 @@ axiosClient.interceptors.request.use(
 );
 
 axiosClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(response.data);
+    return response;
+  },
   (error: AxiosError<Partial<ApiErrorPayload>>) => {
     const apiError = toApiError(error);
 

@@ -1,12 +1,29 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
 
-import { IconSymbol } from '@/src/components/ui/icon-symbol';
-import { useColors } from '@/src/theme';
+import {
+  BottomTabBar,
+  BottomTabBarWithFabProps,
+} from "@/src/components/bottom-tab-bar/bottom-tab-bar";
+import {
+  AddButtonProvider,
+  useAddButtonTrigger,
+} from "@/src/navigation/add-button-context";
+
+function TabBar(
+  props: Parameters<
+    NonNullable<React.ComponentProps<typeof Tabs>["tabBar"]>
+  >[0],
+) {
+  const triggerAdd = useAddButtonTrigger();
+  return (
+    <BottomTabBar
+      {...(props as unknown as BottomTabBarWithFabProps)}
+      onAddPress={triggerAdd}
+    />
+  );
+}
 
 export default function TabLayout() {
-  const colors = useColors();
-
   return (
     <Tabs
       screenOptions={{
