@@ -26,6 +26,7 @@ type AuthTokenGetter = () =>
 
 let getAuthToken: AuthTokenGetter = async () => authStorage.getToken();
 
+
 export function setAuthTokenGetter(getter: AuthTokenGetter): void {
   getAuthToken = getter;
 }
@@ -160,7 +161,10 @@ axiosClient.interceptors.request.use(
 );
 
 axiosClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(response.data);
+    return response;
+  },
   (error: AxiosError<Partial<ApiErrorPayload>>) => {
     const apiError = toApiError(error);
 

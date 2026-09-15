@@ -1,0 +1,125 @@
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { Image, Pressable, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import styles from "./bottom-tab-bar-styles";
+
+import AppAssets from "@/src/constants/app-assets";
+import { useTheme } from "@/src/theme";
+
+/** Route name → its icon. Add an entry here for every VISIBLE tab this bar renders. */
+const ICON_BY_ROUTE_NAME: Record<string, number> = {
+  index: AppAssets.HOME_ICON,
+  calendar: AppAssets.CALENDAR_ICON,
+  completed: AppAssets.HISTORY_ICON,
+  pomodoro: AppAssets.PROFILE_ICON,
+};
+
+const FAB_SIZE = 64;
+
+export interface BottomTabBarWithFabProps extends BottomTabBarProps {
+  onAddPress?: () => void;
+}
+
+export function BottomTabBar({
+  state,
+  navigation,
+  onAddPress,
+}: BottomTabBarWithFabProps) {
+  const theme = useTheme();
+  const insets = useSafeAreaInsets();
+
+  const renderTabIcon = (route: (typeof state.routes)[number]) => {
+    const icon = ICON_BY_ROUTE_NAME[route.name];
+    if (!icon) return null;
+    const routeIndex = state.routes.indexOf(route);
+    const isFocused = state.index === routeIndex;
+
+    const onPress = () => {
+      const event = navigation.emit({
+        type: "tabPress",
+        target: route.key,
+        canPreventDefault: true,
+      });
+
+      if (!isFocused && !event.defaultPrevented) {
+        navigation.navigate(route.name);
+      }
+    };
+
+    return (
+      <Pressable
+        key={route.key}
+        onPress={onPress}
+        hitSlop={12}
+        style={styles.tabButton}
+      >
+        <View
+          style={[
+            styles.tabIconHighlight,
+            {
+              backgroundColor: isFocused
+                ? theme.colors.primarySurface
+                : "transparent",
+              borderRadius: theme.radii.full,
+            },
+          ]}
+        >
+          <Image source={icon} style={styles.tabIcon} resizeMode="contain" />
+        </View>
+      </Pressable>
+    );
+  };
+
+  const visibleRoutes = state.routes.filter(
+    (route) => route.name in ICON_BY_ROUTE_NAME,
+  );
+  const leftRoutes = visibleRoutes.slice(0, 2);
+  const rightRoutes = visibleRoutes.slice(2, 4);
+
+  return (
+    <View
+      style={[
+        styles.wrapper,
+        { paddingBottom: insets.bottom || theme.spacing[16] },
+      ]}
+      pointerEvents="box-none"
+    >
+      <View
+        style={[
+          styles.bar,
+          {
+            backgroundColor: theme.colors.primaryMuted,
+            borderRadius: theme.radii.banner,
+            marginHorizontal: theme.spacing[16],
+          },
+        ]}
+      >
+        <View style={styles.tabGroup}>
+          {leftRoutes.map((route) => renderTabIcon(route))}
+        </View>
+        <View style={{ width: FAB_SIZE + theme.spacing[16] }} />
+        <View style={styles.tabGroup}>
+          {rightRoutes.map((route) => renderTabIcon(route))}
+        </View>
+      </View>
+
+      <Pressable
+        onPress={onAddPress}
+        style={[
+          styles.fab,
+          {
+            backgroundColor: theme.colors.primary,
+            borderRadius: theme.radii.full,
+            ...theme.elevation.level2,
+          },
+        ]}
+      >
+        <Image
+          source={AppAssets.ADD_ICON}
+          style={[styles.fabIcon, { tintColor: theme.colors.onPrimary }]}
+          resizeMode="contain"
+        />
+      </Pressable>
+    </View>
+  );
+}

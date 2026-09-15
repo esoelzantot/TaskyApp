@@ -17,11 +17,8 @@ import { axiosBaseQuery } from "./axios-base-query";
 export const api = createApi({
   reducerPath: "api",
   baseQuery: axiosBaseQuery(),
-  // RTK Query's own reconnect/refocus refetching — see setup-listeners.ts
-  // for why these actually fire correctly in React Native.
   refetchOnReconnect: true,
   refetchOnFocus: true,
-  // Add tag names here as feature slices need them, e.g. ['Task', 'Category'].
-  tagTypes: [],
+  tagTypes: ["Category", "Task"],
   endpoints: () => ({}),
 });
