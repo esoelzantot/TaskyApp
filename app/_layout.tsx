@@ -1,11 +1,13 @@
+import { categoriesApiSlice } from "@/src/rtk/categories-api-slice";
+import { Stack } from "expo-router";
 import {
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,
   ThemeProvider as NavigationThemeProvider,
-} from "@react-navigation/native";
-import { Stack } from "expo-router";
+} from "expo-router/react-navigation";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { Provider as ReduxProvider } from "react-redux";
 
@@ -48,6 +50,9 @@ function RootNavigator() {
     <NavigationThemeProvider value={navigationTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="add-task" options={{ headerShown: false }} />
+        <Stack.Screen name="edit-task/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="task/[id]" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style={mode === "dark" ? "light" : "dark"} />
     </NavigationThemeProvider>
@@ -76,6 +81,10 @@ export default function RootLayout() {
 
   useEffect(() => setupRtkQueryListeners(store), []);
 
+  useEffect(() => {
+    store.dispatch(categoriesApiSlice.endpoints.getCategories.initiate());
+  }, []);
+
   const appReady = fontsLoaded && persistReady;
 
   useEffect(() => {
@@ -91,7 +100,9 @@ export default function RootLayout() {
   return (
     <ReduxProvider store={store}>
       <ThemeProvider>
-        <RootNavigator />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <RootNavigator />
+        </GestureHandlerRootView>
       </ThemeProvider>
     </ReduxProvider>
   );

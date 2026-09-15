@@ -1,30 +1,42 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
 
-import { IconSymbol } from '@/src/components/ui/icon-symbol';
-import { useColors } from '@/src/theme';
+import {
+  BottomTabBar,
+  BottomTabBarWithFabProps,
+} from "@/src/components/bottom-tab-bar/bottom-tab-bar";
+import {
+  AddButtonProvider,
+  useAddButtonTrigger,
+} from "@/src/navigation/add-button-context";
+
+function TabBar(
+  props: Parameters<
+    NonNullable<React.ComponentProps<typeof Tabs>["tabBar"]>
+  >[0],
+) {
+  const triggerAdd = useAddButtonTrigger();
+  return (
+    <BottomTabBar
+      {...(props as unknown as BottomTabBarWithFabProps)}
+      onAddPress={triggerAdd}
+    />
+  );
+}
 
 export default function TabLayout() {
-  const colors = useColors();
-
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.surfaceMuted,
-          borderTopColor: colors.border,
-        },
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+    <AddButtonProvider>
+      <Tabs
+        screenOptions={{ headerShown: false }}
+        tabBar={(props) => <TabBar {...props} />}
+      >
+        <Tabs.Screen name="index" />
+        <Tabs.Screen name="calendar" />
+        <Tabs.Screen name="completed" />
+        <Tabs.Screen name="pomodoro" />
+        {/* ===== HIDDEN SCREENS ===== */}
+        <Tabs.Screen name="category-tasks/[id]" options={{ href: null }} />
+      </Tabs>
+    </AddButtonProvider>
   );
 }
