@@ -4,7 +4,8 @@ import {
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,
   ThemeProvider as NavigationThemeProvider,
-} from "expo-router/react-navigation";
+  Stack,
+} from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -23,9 +24,8 @@ import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync();
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
+// anchor removed so the app starts at index.tsx (splash screen)
+// instead of jumping directly to (tabs)
 
 function RootNavigator() {
   const { mode } = useThemeMode();
@@ -49,6 +49,8 @@ function RootNavigator() {
   return (
     <NavigationThemeProvider value={navigationTheme}>
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="add-task" options={{ headerShown: false }} />
         <Stack.Screen name="edit-task/[id]" options={{ headerShown: false }} />
