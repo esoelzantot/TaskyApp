@@ -1,5 +1,4 @@
 import { categoriesApiSlice } from "@/src/rtk/categories-api-slice";
-import { Stack } from "expo-router";
 import {
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,

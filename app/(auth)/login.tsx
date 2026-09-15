@@ -47,8 +47,6 @@ export default function LoginScreen() {
     // Password validation — exactly 6 characters
     if (!password) {
       newErrors.password = "Password is required";
-    } else if (password.length !== 6) {
-      newErrors.password = "Password must be exactly 6 characters";
     }
 
     setErrors(newErrors);
@@ -187,7 +185,6 @@ export default function LoginScreen() {
                   setErrors((prev) => ({ ...prev, password: undefined }));
               }}
               secureTextEntry
-              maxLength={6}
               icon="lock"
               error={errors.password}
             />
