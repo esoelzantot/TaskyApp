@@ -29,21 +29,6 @@ export default function HomeScreen() {
     setCreateCategoryVisible(false);
   };
 
-  // TODO: replace with real data from the tasks API once it exists.
-  const PLACEHOLDER_IN_PROGRESS_TASKS = [
-    {
-      id: "1",
-      category: "Office Project",
-      title: "Grocery shopping app design",
-    },
-    {
-      id: "2",
-      category: "Personal Project",
-      title: "Uber Eats redesign challenge",
-    },
-    { id: "3", category: "Office Project", title: "Onboarding flow revamp" },
-  ];
-
   return (
     <>
       <ScrollView
@@ -61,11 +46,11 @@ export default function HomeScreen() {
 
         <View style={{ marginTop: theme.spacing[24] }}>
           {/* TODO: replace with the real "completed today / total today" ratio once tasks exist. */}
-          <HomeProgressCard percentage={85} />
+          <HomeProgressCard />
         </View>
 
         <View style={{ marginTop: theme.spacing[24] }}>
-          <InProgressSection tasks={PLACEHOLDER_IN_PROGRESS_TASKS} />
+          <InProgressSection />
         </View>
 
         <View style={{ marginTop: theme.spacing[24] }}>

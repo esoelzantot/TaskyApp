@@ -1,4 +1,5 @@
 import ApiEndpoints from "@/src/apis/api-endpoints";
+import { Progress } from "@/src/models/progress";
 import type {
   CreateTaskRequest,
   GetTasksParams,
@@ -18,7 +19,10 @@ export const tasksApiSlice = api.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.map((task) => ({ type: "Task" as const, id: task.id })),
+              ...result.map((task) => ({
+                type: "Task" as const,
+                id: task.id,
+              })),
               { type: "Task" as const, id: "LIST" },
             ]
           : [{ type: "Task" as const, id: "LIST" }],
@@ -43,6 +47,14 @@ export const tasksApiSlice = api.injectEndpoints({
     getTodayTasks: builder.query<Task[], void>({
       query: () => ({
         url: ApiEndpoints.GET_TODAY_TASKS,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Task", id: "LIST" }],
+    }),
+
+    getProgress: builder.query<Progress, void>({
+      query: () => ({
+        url: ApiEndpoints.GET_PROGRESS,
         method: "GET",
       }),
       providesTags: [{ type: "Task", id: "LIST" }],
@@ -88,7 +100,6 @@ export const tasksApiSlice = api.injectEndpoints({
       ],
     }),
 
-    // No request body — the docs show only the `task_id` path param.
     completeTask: builder.mutation<Task, Task["id"]>({
       query: (taskId) => ({
         url: ApiEndpoints.COMPLETE_TASK_BY_ID(taskId),
@@ -100,6 +111,7 @@ export const tasksApiSlice = api.injectEndpoints({
       ],
     }),
   }),
+
   overrideExisting: false,
 });
 
@@ -108,6 +120,7 @@ export const {
   useGetCompletedTasksQuery,
   useGetActiveTasksQuery,
   useGetTodayTasksQuery,
+  useGetProgressQuery,
   useGetTaskByIdQuery,
   useCreateTaskMutation,
   useUpdateTaskMutation,

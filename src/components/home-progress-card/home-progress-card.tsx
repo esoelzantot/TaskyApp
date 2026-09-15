@@ -1,4 +1,6 @@
+import { useGetProgressQuery } from "@/src/rtk/tasks-api-slice";
 import { useTheme } from "@/src/theme";
+import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import styles from "./home-progress-card-styles";
@@ -6,21 +8,14 @@ import styles from "./home-progress-card-styles";
 const RING_SIZE = 100;
 const RING_WIDTH = 10;
 
-export interface HomeProgressCardProps {
-  percentage: number;
-  title?: string;
-  onViewTasksPress?: () => void;
-  onMenuPress?: () => void;
-}
-
-export function HomeProgressCard({
-  percentage,
-  title = "Your Today is\nAlmost Done!",
-  onViewTasksPress,
-  onMenuPress,
-}: HomeProgressCardProps) {
+export function HomeProgressCard() {
   const theme = useTheme();
-  const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+  const { data: progress } = useGetProgressQuery();
+
+  const completionRate = progress?.completion_rate ?? 0;
+
+  const clampedPercentage = Math.max(0, Math.min(100, completionRate));
 
   return (
     <View
@@ -39,14 +34,16 @@ export function HomeProgressCard({
           <Text
             style={[
               theme.typography.heading2,
-              { color: theme.colors.onPrimary },
+              {
+                color: theme.colors.onPrimary,
+              },
             ]}
           >
-            {title}
+            {"Your Today is\nAlmost Done!"}
           </Text>
 
           <Pressable
-            onPress={onViewTasksPress}
+            onPress={() => router.push("/completed")}
             style={[
               styles.viewTasksButton,
               {
@@ -61,7 +58,9 @@ export function HomeProgressCard({
             <Text
               style={[
                 theme.typography.bodyBold,
-                { color: theme.colors.primary },
+                {
+                  color: theme.colors.primary,
+                },
               ]}
             >
               View Tasks
@@ -82,7 +81,9 @@ export function HomeProgressCard({
             <Text
               style={[
                 theme.typography.subtitle,
-                { color: theme.colors.onPrimary },
+                {
+                  color: theme.colors.onPrimary,
+                },
               ]}
             >
               {`${Math.round(clampedPercentage)}%`}
