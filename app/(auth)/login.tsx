@@ -1,14 +1,24 @@
-import { View, Text, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, Alert } from "react-native";
-import { useTheme } from "@/src/theme";
+import ApiEndpoints from "@/src/apis/api-endpoints";
+// eslint-disable-next-line import/no-named-as-default
+import axiosClient from "@/src/apis/axios-client";
 import { Button } from "@/src/components/Button";
 import { TextInput } from "@/src/components/TextInput";
+import { IconSymbol } from "@/src/components/ui/icon-symbol";
+import { authStorage } from "@/src/storage/auth";
+import { useTheme } from "@/src/theme";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import axiosClient from "@/src/apis/axios-client";
-import ApiEndpoints from "@/src/apis/api-endpoints";
-import { authStorage } from "@/src/storage/auth";
-import { IconSymbol } from "@/src/components/ui/icon-symbol";
-import { Image } from "expo-image";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -62,46 +72,95 @@ export default function LoginScreen() {
         router.replace("/(tabs)");
       }
     } catch (error: any) {
-      Alert.alert("Login Failed", error.message || "Please check your credentials");
+      Alert.alert(
+        "Login Failed",
+        error.message || "Please check your credentials",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.surface }]}>
-      <KeyboardAvoidingView 
-        style={{ flex: 1 }} 
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: colors.surface }]}
+    >
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.header}>
-            <Text style={[typography.bodyBold, { color: colors.textSecondary }]}>
-              Log In
-            </Text>
-          </View>
+          <View style={{ height: spacing[24] }}></View>
 
           <View style={styles.topSection}>
-            <Text style={[typography.display, { color: colors.textPrimary, textAlign: "center", marginBottom: 8 }]}>
+            <Text
+              style={[
+                typography.display,
+                {
+                  color: colors.textPrimary,
+                  textAlign: "center",
+                  marginBottom: 8,
+                },
+              ]}
+            >
               Welcome Back
             </Text>
-            <Text style={[typography.bodyBold, { color: colors.textSecondary, textAlign: "center" }]}>
-              It's time to be productive
+            <Text
+              style={[
+                typography.bodyBold,
+                { color: colors.textSecondary, textAlign: "center" },
+              ]}
+            >
+              {"It's time to be productive"}
             </Text>
           </View>
 
-          <View style={[styles.card, { backgroundColor: colors.surface, borderRadius: radii.banner, shadowColor: colors.primary }]}>
+          <View style={{ height: spacing[24] }}></View>
+
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: colors.surface,
+                borderTopRightRadius: 48,
+                borderTopLeftRadius: 48,
+                shadowColor: colors.primary,
+              },
+            ]}
+          >
             <View style={styles.cardHeader}>
-              <View style={[styles.iconBox, { backgroundColor: colors.primaryMuted, borderRadius: radii.md }]}>
-                <IconSymbol name="rectangle.portrait.and.arrow.right" size={24} color={colors.primary} />
+              <View
+                style={[
+                  styles.iconBox,
+                  {
+                    backgroundColor: colors.primaryMuted,
+                    borderRadius: radii.md,
+                  },
+                ]}
+              >
+                <IconSymbol
+                  name="rectangle.portrait.and.arrow.right"
+                  size={24}
+                  color={colors.primary}
+                />
               </View>
               <View>
-                <Text style={[typography.heading2, { color: colors.textPrimary }]}>Log In</Text>
-                <Text style={[typography.small, { color: colors.textSecondary }]}>Enter Your Credentials to continue</Text>
+                <Text
+                  style={[typography.heading2, { color: colors.textPrimary }]}
+                >
+                  Log In
+                </Text>
+                <Text
+                  style={[typography.small, { color: colors.textSecondary }]}
+                >
+                  Enter Your Credentials to continue
+                </Text>
               </View>
             </View>
 
-            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <View
+              style={[styles.divider, { backgroundColor: colors.border }]}
+            />
 
             <TextInput
               label="Email"
@@ -109,21 +168,23 @@ export default function LoginScreen() {
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
-                if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+                if (errors.email)
+                  setErrors((prev) => ({ ...prev, email: undefined }));
               }}
               autoCapitalize="none"
               keyboardType="email-address"
               icon="envelope"
               error={errors.email}
             />
-            
+
             <TextInput
               label="Password"
               placeholder="Password"
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
-                if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+                if (errors.password)
+                  setErrors((prev) => ({ ...prev, password: undefined }));
               }}
               secureTextEntry
               maxLength={6}
@@ -139,11 +200,14 @@ export default function LoginScreen() {
               />
             </View>
 
-            <Text 
-              style={[typography.bodyBold, { color: colors.primary, textAlign: 'center', marginTop: 16 }]}
+            <Text
+              style={[
+                typography.bodyBold,
+                { color: colors.primary, textAlign: "center", marginTop: 16 },
+              ]}
               onPress={() => router.push("/(auth)/signup")}
             >
-              Don't have an account? Sign Up
+              {"Don't have an account? Sign Up"}
             </Text>
           </View>
         </ScrollView>
