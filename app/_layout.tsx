@@ -87,7 +87,6 @@ export default function RootLayout() {
     store.dispatch(categoriesApiSlice.endpoints.getCategories.initiate());
   }, []);
 
-  const appReady = fontsLoaded && persistReady;
 
   useEffect(() => {
     if (appReady) {

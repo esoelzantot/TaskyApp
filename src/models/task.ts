@@ -41,7 +41,7 @@ export interface Task {
   category_name: string | null;
 }
 
-export type DailyPlannerResponse = Task[];
+export type DailyPlannerResponse = {
   due_date: string;
   priority: Priority;
   completed: boolean;

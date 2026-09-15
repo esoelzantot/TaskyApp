@@ -9,7 +9,7 @@ import { useTheme } from "@/src/theme";
 /** Route name → its icon. Add an entry here for every VISIBLE tab this bar renders. */
 const ICON_BY_ROUTE_NAME: Record<string, number> = {
   index: AppAssets.HOME_ICON,
-  calendar: AppAssets.CALENDAR_ICON,
+  planner: AppAssets.CALENDAR_ICON,
   completed: AppAssets.HISTORY_ICON,
   pomodoro: AppAssets.PROFILE_ICON,
 };
