@@ -61,7 +61,7 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useAppFonts();
+  const [fontsLoaded, fontError] = useAppFonts();
 
   // `persistor`'s cache rehydration from AsyncStorage is async — this
   // tracks when it's done, so the offline-first cached data is already
@@ -82,6 +82,7 @@ export default function RootLayout() {
 
   useEffect(() => setupRtkQueryListeners(store), []);
 
+  const appReady = (fontsLoaded || fontError) && persistReady;
   useEffect(() => {
     store.dispatch(categoriesApiSlice.endpoints.getCategories.initiate());
   }, []);
@@ -90,7 +91,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (appReady) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(() => {
+        /* Ignore error if already hidden */
+      });
     }
   }, [appReady]);
 

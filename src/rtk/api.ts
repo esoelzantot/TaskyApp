@@ -19,6 +19,7 @@ export const api = createApi({
   baseQuery: axiosBaseQuery(),
   refetchOnReconnect: true,
   refetchOnFocus: true,
-  tagTypes: ["Category", "Task"],
+  // Add tag names here as feature slices need them, e.g. ['Task', 'Category'].
+  tagTypes: ["Category", "Task", "Planner"],
   endpoints: () => ({}),
 });

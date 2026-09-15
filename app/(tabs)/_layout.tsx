@@ -25,18 +25,30 @@ function TabBar(
 
 export default function TabLayout() {
   return (
-    <AddButtonProvider>
-      <Tabs
-        screenOptions={{ headerShown: false }}
-        tabBar={(props) => <TabBar {...props} />}
-      >
-        <Tabs.Screen name="index" />
-        <Tabs.Screen name="calendar" />
-        <Tabs.Screen name="completed" />
-        <Tabs.Screen name="pomodoro" />
-        {/* ===== HIDDEN SCREENS ===== */}
-        <Tabs.Screen name="category-tasks/[id]" options={{ href: null }} />
-      </Tabs>
-    </AddButtonProvider>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarStyle: {
+          backgroundColor: colors.surfaceMuted,
+          borderTopColor: colors.border,
+        },
+      }}>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="planner"
+        options={{
+          title: 'Planner',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar" color={color} />,
+        }}
+      />
+    </Tabs>
   );
 }
