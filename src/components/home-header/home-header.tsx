@@ -21,10 +21,10 @@ export function HomeHeader({
 
   const handleToggleTheme = () => setMode(mode === "dark" ? "light" : "dark");
 
-  const notificationIcon =
-    mode !== "dark"
-      ? AppAssets.NOTIFICATION_LIGHT_ICON
-      : AppAssets.NOTIFICATION_DARK_ICON;
+  // const notificationIcon =
+  //   mode !== "dark"
+  //     ? AppAssets.NOTIFICATION_LIGHT_ICON
+  //     : AppAssets.NOTIFICATION_DARK_ICON;
 
   const themeIcon =
     mode !== "dark" ? AppAssets.MOON_LIGHT_ICON : AppAssets.SUN_DARK_ICON;
@@ -91,7 +91,7 @@ export function HomeHeader({
           />
         </Pressable>
 
-        <Pressable
+        {/* <Pressable
           onPress={onNotificationPress}
           hitSlop={12}
           style={styles.bellButton}
@@ -112,7 +112,7 @@ export function HomeHeader({
               ]}
             />
           )}
-        </Pressable>
+        </Pressable> */}
       </View>
     </View>
   );

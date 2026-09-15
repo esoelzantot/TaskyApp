@@ -2,34 +2,30 @@ import { useRouter } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import styles from "./screen-header-styles";
-
 import AppAssets from "@/src/constants/app-assets";
 import { useTheme, useThemeMode } from "@/src/theme";
 
+import styles from "./screen-header-styles";
+
 export interface ScreenHeaderProps {
   title: string;
-  hasUnreadNotifications?: boolean;
-  onNotificationPress?: () => void;
 }
 
-export function ScreenHeader({
-  title,
-  hasUnreadNotifications = false,
-  onNotificationPress,
-}: ScreenHeaderProps) {
+export function ScreenHeader({ title }: ScreenHeaderProps) {
   const theme = useTheme();
-  const { mode } = useThemeMode();
+  const { mode, setMode } = useThemeMode();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const arrowIcon =
     mode !== "dark" ? AppAssets.ARROW_LIGHT_ICON : AppAssets.ARROW_DARK_ICON;
 
-  const notificationIcon =
-    mode !== "dark"
-      ? AppAssets.NOTIFICATION_LIGHT_ICON
-      : AppAssets.NOTIFICATION_DARK_ICON;
+  const themeIcon =
+    mode !== "dark" ? AppAssets.MOON_LIGHT_ICON : AppAssets.SUN_DARK_ICON;
+
+  const handleToggleTheme = () => {
+    setMode(mode === "dark" ? "light" : "dark");
+  };
 
   return (
     <View
@@ -43,10 +39,13 @@ export function ScreenHeader({
         },
       ]}
     >
+      {/* Back Button */}
       <Pressable
         onPress={() => router.back()}
         hitSlop={12}
         style={styles.sideSlot}
+        accessibilityRole="button"
+        accessibilityLabel="Go back"
       >
         <Image
           source={arrowIcon}
@@ -55,11 +54,14 @@ export function ScreenHeader({
         />
       </Pressable>
 
+      {/* Title */}
       <View style={styles.titleSlot}>
         <Text
           style={[
             theme.typography.heading1,
-            { color: theme.colors.textPrimary },
+            {
+              color: theme.colors.textPrimary,
+            },
           ]}
           numberOfLines={1}
         >
@@ -67,27 +69,21 @@ export function ScreenHeader({
         </Text>
       </View>
 
+      {/* Theme Toggle */}
       <Pressable
-        onPress={onNotificationPress}
+        onPress={handleToggleTheme}
         hitSlop={12}
-        style={[styles.sideSlot, styles.bellSlot]}
+        style={styles.bellSlot}
+        accessibilityRole="button"
+        accessibilityLabel={
+          mode === "dark" ? "Switch to light mode" : "Switch to dark mode"
+        }
       >
         <Image
-          source={notificationIcon}
+          source={themeIcon}
           style={styles.bellIcon}
           resizeMode="contain"
         />
-        {hasUnreadNotifications && (
-          <View
-            style={[
-              styles.badge,
-              {
-                backgroundColor: theme.colors.primary,
-                borderColor: theme.colors.background,
-              },
-            ]}
-          />
-        )}
       </Pressable>
     </View>
   );

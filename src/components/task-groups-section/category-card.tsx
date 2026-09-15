@@ -1,9 +1,12 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
-import React, { useRef, useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { useRef, useState } from "react";
+import { Pressable, Text, View } from "react-native";
 import type { SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+
+import { CategoryDialog } from "@/src/components/dialogs/category-dialog";
+import { ConfirmDialog } from "@/src/components/dialogs/confirm-dialog";
 
 import {
   useDeleteCategoryMutation,
@@ -13,7 +16,6 @@ import {
 import type { ThemeColors } from "@/src/theme";
 import { useTheme } from "@/src/theme";
 
-import { CategoryDialog } from "@/src/components/dialogs/category-dialog";
 import type { TaskGroup } from "./task-groups-section";
 import styles from "./task-groups-section-styles";
 
@@ -43,6 +45,7 @@ function getGroupIconStyle(colors: ThemeColors, index: number): GroupIconStyle {
       iconColor: colors.accentOrange,
     },
   ];
+
   return combos[index % combos.length];
 }
 
@@ -53,50 +56,56 @@ export interface CategoryCardProps {
 
 export function CategoryCard({ group, index }: CategoryCardProps) {
   const theme = useTheme();
+
   const swipeableRef = useRef<SwipeableMethods>(null);
+
   const iconStyle = getGroupIconStyle(theme.colors, index);
+
   const [updateCategory] = useUpdateCategoryMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
 
   const [isUpdateCategoryVisible, setUpdateCategoryVisible] = useState(false);
 
+  const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
+
   const handlePress = () => {
     router.push({
       pathname: "/category-tasks/[id]",
-      params: { id: group.id, name: group.name },
+      params: {
+        id: group.id,
+        name: group.name,
+      },
     });
   };
 
   const handleEdit = async (name: string) => {
     swipeableRef.current?.close();
-    await updateCategory({ id: group.id, name: name }).unwrap();
+
+    await updateCategory({
+      id: group.id,
+      name,
+    }).unwrap();
+
     console.log("update category:", name);
+
     setUpdateCategoryVisible(false);
   };
 
   const handleDelete = () => {
     swipeableRef.current?.close();
-    Alert.alert(
-      "Delete Task Group",
-      `Delete "${group.name}"? This can't be undone.`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            deleteCategory(group.id)
-              .unwrap()
-              .catch(() => {
-                Alert.alert(
-                  "Something went wrong",
-                  "Couldn't delete this group. Please try again.",
-                );
-              });
-          },
-        },
-      ],
-    );
+    setIsConfirmDialogVisible(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setIsConfirmDialogVisible(false);
+
+    deleteCategory(group.id)
+      .unwrap()
+      .catch(() => {
+        // لو ConfirmDialog مخصص للـ confirmation فقط،
+        // نستخدم Alert هنا فقط لعرض error وليس confirmation.
+        console.error("Couldn't delete this group.");
+      });
   };
 
   return (
@@ -132,6 +141,7 @@ export function CategoryCard({ group, index }: CategoryCardProps) {
                 color={theme.colors.onPrimary}
               />
             </Pressable>
+
             <Pressable
               onPress={handleDelete}
               style={{
@@ -185,11 +195,14 @@ export function CategoryCard({ group, index }: CategoryCardProps) {
             <Text
               style={[
                 theme.typography.title,
-                { color: theme.colors.textPrimary },
+                {
+                  color: theme.colors.textPrimary,
+                },
               ]}
             >
               {group.name}
             </Text>
+
             <Text
               style={[
                 theme.typography.body,
@@ -205,11 +218,20 @@ export function CategoryCard({ group, index }: CategoryCardProps) {
         </Pressable>
       </ReanimatedSwipeable>
 
+      {/* Edit Category Dialog */}
       <CategoryDialog
-        title="Add a Category"
+        title="Edit Category"
         visible={isUpdateCategoryVisible}
         onClose={() => setUpdateCategoryVisible(false)}
         onSubmit={handleEdit}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        title={`Delete "${group.name}"? \n This can't be undone.`}
+        visible={isConfirmDialogVisible}
+        onClose={() => setIsConfirmDialogVisible(false)}
+        onSubmit={handleDeleteConfirm}
       />
     </>
   );

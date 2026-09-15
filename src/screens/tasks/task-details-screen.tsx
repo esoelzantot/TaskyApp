@@ -1,3 +1,4 @@
+import { ConfirmDialog } from "@/src/components/dialogs/confirm-dialog";
 import { ScreenHeader } from "@/src/components/screen-header/screen-header";
 import { DangerButton } from "@/src/components/tasks/danger-button";
 import { PrimaryButton } from "@/src/components/tasks/primary-button";
@@ -10,6 +11,7 @@ import {
 import { useTheme } from "@/src/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import styles from "./task-details-styles";
@@ -23,25 +25,40 @@ function getPriorityStyle(
   priority: Priority,
 ) {
   switch (priority.toUpperCase()) {
-    case "High".toUpperCase():
+    case "HIGH":
       return {
         backgroundColor: colors.accentOrangeLight,
         color: colors.accentOrange,
       };
-    case "Medium".toUpperCase():
+
+    case "MEDIUM":
       return {
         backgroundColor: colors.accentBlueLight,
         color: colors.accentBlue,
       };
-    case "Low".toUpperCase():
-      return { backgroundColor: colors.success, color: colors.onSuccess };
+
+    case "LOW":
+      return {
+        backgroundColor: colors.success,
+        color: colors.onSuccess,
+      };
+
+    default:
+      return {
+        backgroundColor: colors.accentBlueLight,
+        color: colors.accentBlue,
+      };
   }
 }
 
 export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+
+  const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
+
   const [updateTask, { isLoading: isToggling }] = useUpdateTaskMutation();
+
   const [deleteTask] = useDeleteTaskMutation();
 
   const priorityStyle = getPriorityStyle(theme.colors, task.priority);
@@ -81,32 +98,34 @@ export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
   };
 
   const handleDeletePress = () => {
-    Alert.alert(
-      "Delete Task",
-      `Delete "${task.title}"? This can't be undone.`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            deleteTask(task.id)
-              .unwrap()
-              .then(() => router.back())
-              .catch(() => {
-                Alert.alert(
-                  "Something went wrong",
-                  "Couldn't delete this task. Please try again.",
-                );
-              });
-          },
-        },
-      ],
-    );
+    setIsConfirmDialogVisible(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setIsConfirmDialogVisible(false);
+
+    deleteTask(task.id)
+      .unwrap()
+      .then(() => {
+        router.back();
+      })
+      .catch(() => {
+        Alert.alert(
+          "Something went wrong",
+          "Couldn't delete this task. Please try again.",
+        );
+      });
   };
 
   return (
-    <View style={[styles.flex, { backgroundColor: theme.colors.background }]}>
+    <View
+      style={[
+        styles.flex,
+        {
+          backgroundColor: theme.colors.background,
+        },
+      ]}
+    >
       <ScreenHeader title="Task Details" />
 
       <ScrollView
@@ -143,7 +162,9 @@ export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
               <Text
                 style={[
                   theme.typography.bodyBold,
-                  { color: theme.colors.primary },
+                  {
+                    color: theme.colors.primary,
+                  },
                 ]}
               >
                 {task.category_name}
@@ -162,6 +183,7 @@ export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
               >
                 Completed
               </Text>
+
               <Pressable
                 onPress={handleToggleComplete}
                 disabled={isToggling}
@@ -194,11 +216,14 @@ export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
             <Text
               style={[
                 theme.typography.body,
-                { color: theme.colors.textSecondary },
+                {
+                  color: theme.colors.textSecondary,
+                },
               ]}
             >
               Task Title
             </Text>
+
             <Text
               style={[
                 theme.typography.heading1,
@@ -226,11 +251,14 @@ export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
             <Text
               style={[
                 theme.typography.body,
-                { color: theme.colors.textSecondary },
+                {
+                  color: theme.colors.textSecondary,
+                },
               ]}
             >
               Description
             </Text>
+
             <Text
               style={[
                 theme.typography.body,
@@ -259,24 +287,37 @@ export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
               <Text
                 style={[
                   theme.typography.body,
-                  { color: theme.colors.textSecondary },
+                  {
+                    color: theme.colors.textSecondary,
+                  },
                 ]}
               >
                 Due Date
               </Text>
+
               <View
-                style={[styles.dueDateRow, { marginTop: theme.spacing[8] }]}
+                style={[
+                  styles.dueDateRow,
+                  {
+                    marginTop: theme.spacing[8],
+                  },
+                ]}
               >
                 <MaterialIcons
                   name="event"
                   size={18}
                   color={theme.colors.primary}
-                  style={{ marginRight: theme.spacing[8] }}
+                  style={{
+                    marginRight: theme.spacing[8],
+                  }}
                 />
+
                 <Text
                   style={[
                     theme.typography.bodyBold,
-                    { color: theme.colors.textPrimary },
+                    {
+                      color: theme.colors.textPrimary,
+                    },
                   ]}
                 >
                   {formatDate(new Date(task.due_date))}
@@ -288,11 +329,14 @@ export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
               <Text
                 style={[
                   theme.typography.body,
-                  { color: theme.colors.textSecondary },
+                  {
+                    color: theme.colors.textSecondary,
+                  },
                 ]}
               >
                 Priority
               </Text>
+
               <View
                 style={[
                   styles.priorityPill,
@@ -308,7 +352,9 @@ export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
                 <Text
                   style={[
                     theme.typography.bodyBold,
-                    { color: priorityStyle.color },
+                    {
+                      color: priorityStyle.color,
+                    },
                   ]}
                 >
                   {task.priority}
@@ -321,17 +367,31 @@ export function TaskDetailsScreen({ task }: TaskDetailsScreenProps) {
         <View
           style={[
             styles.buttonRow,
-            { marginTop: theme.spacing[24], gap: theme.spacing[12] },
+            {
+              marginTop: theme.spacing[24],
+              gap: theme.spacing[12],
+            },
           ]}
         >
           <View style={styles.buttonSlot}>
             <PrimaryButton label="Edit Task" onPress={handleEditPress} />
           </View>
+
           <View style={styles.buttonSlot}>
             <DangerButton label="Delete" onPress={handleDeletePress} />
           </View>
         </View>
       </ScrollView>
+
+      {/* Delete Confirmation Dialog */}
+      {isConfirmDialogVisible && (
+        <ConfirmDialog
+          title={`Delete "${task.title}"? \n This can't be undone.`}
+          visible={isConfirmDialogVisible}
+          onClose={() => setIsConfirmDialogVisible(false)}
+          onSubmit={handleDeleteConfirm}
+        />
+      )}
     </View>
   );
 }
