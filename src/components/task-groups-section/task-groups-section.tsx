@@ -110,7 +110,7 @@ export function TaskGroupsSection() {
 
       {isLoading ? (
         <CategoriesSkeleton />
-      ) : hasCategories ? (
+      ) : !hasCategories ? (
         <CategoriesEmptyState
           onCreatePress={() => setCreateCategoryVisible(true)}
         />

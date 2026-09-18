@@ -1,64 +1,66 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setAuthTokenGetter } from "../apis/axios-client";
 
 const TOKEN_KEY = "auth_token";
 const USER_NAME_KEY = "auth_user_name";
 
 export const authStorage = {
-  getToken: async () => {
+  getToken: async (): Promise<string | null> => {
     try {
       return await AsyncStorage.getItem(TOKEN_KEY);
-    } catch (e) {
+    } catch {
       return null;
     }
   },
-  setToken: async (token: string) => {
+
+  setToken: async (token: string): Promise<void> => {
     try {
       await AsyncStorage.setItem(TOKEN_KEY, token);
-    } catch (e) {
-      // noop
-    }
-  },
-  removeToken: async () => {
-    try {
-      await AsyncStorage.removeItem(TOKEN_KEY);
-    } catch (e) {
+    } catch {
       // noop
     }
   },
 
-  getUserName: async () => {
+  removeToken: async (): Promise<void> => {
+    try {
+      await AsyncStorage.removeItem(TOKEN_KEY);
+    } catch {
+      // noop
+    }
+  },
+
+  getUserName: async (): Promise<string | null> => {
     try {
       return await AsyncStorage.getItem(USER_NAME_KEY);
-    } catch (e) {
+    } catch {
       return null;
     }
   },
-  setUserName: async (name: string) => {
+
+  setUserName: async (name: string): Promise<void> => {
     try {
       await AsyncStorage.setItem(USER_NAME_KEY, name);
-    } catch (e) {
-      // noop
-    }
-  },
-  removeUserName: async () => {
-    try {
-      await AsyncStorage.removeItem(USER_NAME_KEY);
-    } catch (e) {
+    } catch {
       // noop
     }
   },
 
-  /** Clears everything stored at login — use this on logout. */
-  clear: async () => {
+  removeUserName: async (): Promise<void> => {
+    try {
+      await AsyncStorage.removeItem(USER_NAME_KEY);
+    } catch {
+      // noop
+    }
+  },
+
+  /**
+   * Clears all authentication-related data.
+   * Use this when logging out.
+   */
+  clear: async (): Promise<void> => {
     try {
       await AsyncStorage.multiRemove([TOKEN_KEY, USER_NAME_KEY]);
-    } catch (e) {
-      // noop
-      console.error(e);
+    } catch (error) {
+      console.error("Failed to clear auth storage:", error);
     }
   },
 };
-
-// Wire it up to the axios client
-setAuthTokenGetter(authStorage.getToken);

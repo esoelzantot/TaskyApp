@@ -3,7 +3,7 @@
     "name": "Tasky",
     "slug": "Tasky",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "tasky",
     "userInterfaceStyle": "automatic",
@@ -17,7 +17,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.eslamshaker.Tasky"
     },
     "web": {
       "output": "static",
