@@ -4,7 +4,7 @@ abstract class ApiEndpoints {
   // Auth
   static readonly LOGIN = "/auth/login";
   static readonly REGISTER = "/auth/register";
-  static readonly GET_CURRENT_USER = "/auth/me";
+  static readonly ME = "/auth/me";
 
   // Tasks
   static readonly CREATE_TASK = "/tasks/";

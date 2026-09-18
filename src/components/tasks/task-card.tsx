@@ -4,11 +4,11 @@ import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { FieldCard } from "@/src/components/tasks/field-card";
 import { formatDate } from "@/src/helpers/format-date";
-import type { Task } from "@/src/models/task";
+import type { Priority, Task } from "@/src/models/task";
 import { useUpdateTaskMutation } from "@/src/rtk/tasks-api-slice";
+import type { ThemeColors } from "@/src/theme";
 import { useTheme } from "@/src/theme";
-
-export type TaskCardStatus = "To-do" | "Done";
+import { withAlpha } from "@/src/utils/shimmer-bar";
 
 export type TaskCardData = Task;
 
@@ -16,16 +16,32 @@ interface TaskCardProps {
   task: Task;
 }
 
+function normalizePriority(priority: string): Priority {
+  const value = priority?.trim().toLowerCase();
+  if (value === "high") return "High";
+  if (value === "medium") return "Medium";
+  return "Low";
+}
+
+function getPriorityStyle(colors: ThemeColors, priority: Priority) {
+  switch (priority) {
+    case "High":
+      return { bg: withAlpha(colors.error, 0.15), text: colors.error };
+    case "Medium":
+      return { bg: colors.accentOrangeLight, text: colors.accentOrange };
+    case "Low":
+      return { bg: colors.success, text: colors.onSuccess };
+    default:
+      return { bg: colors.accentBlueLight, text: colors.accentBlue };
+  }
+}
+
 export function TaskCard({ task }: TaskCardProps) {
   const { colors, typography, spacing, radii } = useTheme();
   const [updateTask, { isLoading: isToggling }] = useUpdateTaskMutation();
 
-  const status: TaskCardStatus = task.completed ? "Done" : "To-do";
-  const statusColors: Record<TaskCardStatus, { bg: string; text: string }> = {
-    Done: { bg: colors.success, text: colors.onSuccess },
-    "To-do": { bg: colors.infoSurface, text: colors.info },
-  };
-  const statusStyle = statusColors[status];
+  const priority = normalizePriority(task.priority);
+  const priorityStyle = getPriorityStyle(colors, priority);
 
   const handlePress = () => {
     router.push({
@@ -40,8 +56,8 @@ export function TaskCard({ task }: TaskCardProps) {
       title: task.title,
       description: task.description,
       due_date: task.due_date,
-      priority: task.priority,
-      category_id: task.category_id,
+      priority,
+      category_id: Number(task.category_id),
       completed: !task.completed,
     })
       .unwrap()
@@ -98,10 +114,6 @@ export function TaskCard({ task }: TaskCardProps) {
               {task.title}
             </Text>
 
-            {/* NOTE: the reference design shows a time ("04:00 PM") alongside
-                the date, but the API's `due_date` is a date-only string with
-                no time component — showing the date only until/unless a time
-                field exists. */}
             <View style={[styles.timeRow, { marginTop: spacing[6] }]}>
               <Ionicons name="time-outline" size={14} color={colors.primary} />
               <Text
@@ -117,17 +129,17 @@ export function TaskCard({ task }: TaskCardProps) {
 
           <View
             style={[
-              styles.statusPill,
+              styles.priorityPill,
               {
-                backgroundColor: statusStyle.bg,
-                borderRadius: radii.full,
+                backgroundColor: priorityStyle.bg,
+                borderRadius: radii.sm,
                 paddingHorizontal: spacing[12],
-                paddingVertical: spacing[4],
+                paddingVertical: spacing[6],
               },
             ]}
           >
-            <Text style={[typography.bodyBold, { color: statusStyle.text }]}>
-              {status === "To-do" ? "To Do" : status}
+            <Text style={[typography.body, { color: priorityStyle.text }]}>
+              {priority}
             </Text>
           </View>
         </View>
@@ -155,7 +167,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  statusPill: {
+  priorityPill: {
     alignSelf: "flex-start",
   },
 });

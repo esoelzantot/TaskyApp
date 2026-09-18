@@ -22,6 +22,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function extractUserName(payload: any, fallbackEmail: string): string {
+  const candidate =
+    payload?.name ??
+    payload?.full_name ??
+    payload?.username ??
+    payload?.user?.name ??
+    payload?.user?.full_name ??
+    payload?.user?.username;
+
+  if (typeof candidate === "string" && candidate.trim()) {
+    return candidate.trim();
+  }
+
+  return fallbackEmail.split("@")[0];
+}
+
 export default function LoginScreen() {
   const { colors, typography, radii, spacing } = useTheme();
   const router = useRouter();
@@ -57,16 +73,31 @@ export default function LoginScreen() {
     if (loading) return; // Prevent double-clicks
     if (!validate()) return;
 
+    const trimmedEmail = email.trim();
+
     try {
       setLoading(true);
       const response = await axiosClient.post(ApiEndpoints.LOGIN, {
-        email: email.trim(),
+        email: trimmedEmail,
         password,
       });
 
       const token = response.data.access_token;
       if (token) {
         await authStorage.setToken(token);
+
+        let userName = extractUserName(response.data, trimmedEmail);
+
+        if (userName === trimmedEmail.split("@")[0]) {
+          try {
+            const meResponse = await axiosClient.get(ApiEndpoints.ME);
+            userName = extractUserName(meResponse.data, trimmedEmail);
+          } catch {
+            // keep the email-derived fallback
+          }
+        }
+
+        await authStorage.setUserName(userName);
         router.replace("/(tabs)");
       }
     } catch (error: any) {
