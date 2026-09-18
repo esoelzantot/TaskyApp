@@ -48,3 +48,55 @@ export function addDays(date: Date, days: number): Date {
   result.setDate(result.getDate() + days);
   return result;
 }
+
+export const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+/**
+ * Number of days in the given month.
+ */
+export function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+/** Every calendar date in the given month, in order (1st through the last day). */
+export function getDatesInMonth(year: number, month: number): Date[] {
+  const total = getDaysInMonth(year, month);
+  return Array.from(
+    { length: total },
+    (_, index) => new Date(year, month, index + 1),
+  );
+}
+
+/**
+ * Re-applies `date`'s day-of-month onto a different (year, month)
+ */
+export function clampDateToMonth(
+  date: Date,
+  year: number,
+  month: number,
+): Date {
+  const lastDayOfMonth = getDaysInMonth(year, month);
+  const day = Math.min(date.getDate(), lastDayOfMonth);
+  return new Date(year, month, day);
+}
+
+export function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}

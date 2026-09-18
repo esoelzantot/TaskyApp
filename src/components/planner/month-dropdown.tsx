@@ -2,49 +2,35 @@ import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
-import { useGetCategoriesQuery } from "@/src/rtk/categories-api-slice";
 import { useTheme } from "@/src/theme";
-import { useMemo } from "react";
+import { MONTH_NAMES } from "@/src/utils/date";
 
-export type CategoryFilterValue = number | "all";
-
-interface CategoryFilterOption {
+interface MonthOption {
   label: string;
-  value: CategoryFilterValue;
+  value: number;
 }
 
-interface CategoryFilterDropdownProps {
-  value: CategoryFilterValue;
-  onChange: (value: CategoryFilterValue) => void;
+const MONTH_OPTIONS: MonthOption[] = MONTH_NAMES.map((name, index) => ({
+  label: name,
+  value: index,
+}));
+
+interface MonthDropdownProps {
+  /** 0-indexed, matching `Date`'s own convention. */
+  value: number;
+  onChange: (month: number) => void;
 }
 
-/** A pill-shaped dropdown for filtering a task list by category — "All Categories" plus every real category. */
-export function CategoryFilterDropdown({
-  value,
-  onChange,
-}: CategoryFilterDropdownProps) {
+/** Same visual pattern as CategoryFilterDropdown (pill, react-native-element-dropdown) — deliberately not a new dropdown style. */
+export function MonthDropdown({ value, onChange }: MonthDropdownProps) {
   const { colors, typography, spacing, radii } = useTheme();
-  const { data: categories, isLoading } = useGetCategoriesQuery();
-
-  const options = useMemo<CategoryFilterOption[]>(
-    () => [
-      { label: "All Categories", value: "all" },
-      ...(categories ?? []).map((category) => ({
-        label: category.name,
-        value: Number(category.id),
-      })),
-    ],
-    [categories],
-  );
 
   return (
     <Dropdown
-      data={options}
+      data={MONTH_OPTIONS}
       labelField="label"
       valueField="value"
       value={value}
-      placeholder={isLoading ? "Loading..." : "All Categories"}
-      disable={isLoading}
       onChange={(item) => onChange(item.value)}
       style={[
         styles.dropdown,
@@ -61,7 +47,6 @@ export function CategoryFilterDropdown({
       itemContainerStyle={{ borderRadius: radii.sm }}
       activeColor={colors.primarySurface}
       selectedTextStyle={[typography.bodyBold, { color: colors.primary }]}
-      placeholderStyle={[typography.bodyBold, { color: colors.primary }]}
       itemTextStyle={[typography.body, { color: colors.textPrimary }]}
       renderRightIcon={() => (
         <Ionicons name="chevron-down" size={16} color={colors.primary} />
@@ -74,8 +59,6 @@ const styles = StyleSheet.create({
   dropdown: {
     height: 44,
     width: "100%",
-    alignSelf: "flex-start",
-    marginVertical: 8,
   },
   dropdownContainer: {
     borderWidth: 0,
