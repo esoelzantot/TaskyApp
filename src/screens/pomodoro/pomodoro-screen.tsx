@@ -24,6 +24,7 @@ function PomodoroScreen() {
             totalSeconds={pomodoro.totalSeconds}
             isRunning={pomodoro.isRunning}
             isComplete={pomodoro.isComplete}
+            dailyStats={pomodoro.dailyStats}
             onSelectSession={pomodoro.selectSession}
             onStart={pomodoro.start}
             onPause={pomodoro.pause}
