@@ -1,12 +1,14 @@
+
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Image, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import styles from "./bottom-tab-bar-styles";
 
 import AppAssets from "@/src/constants/app-assets";
 import { useTheme } from "@/src/theme";
 
-/** Route name → its icon. Add an entry here for every VISIBLE tab this bar renders. */
+/** Route name → its icon. */
 const ICON_BY_ROUTE_NAME: Record<string, number> = {
   index: AppAssets.HOME_ICON,
   planner: AppAssets.CALENDAR_ICON,
@@ -18,19 +20,23 @@ const FAB_SIZE = 64;
 
 export interface BottomTabBarWithFabProps extends BottomTabBarProps {
   onAddPress?: () => void;
+  showAddButton?: boolean;
 }
 
 export function BottomTabBar({
   state,
   navigation,
   onAddPress,
+  showAddButton = true,
 }: BottomTabBarWithFabProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
   const renderTabIcon = (route: (typeof state.routes)[number]) => {
     const icon = ICON_BY_ROUTE_NAME[route.name];
+
     if (!icon) return null;
+
     const routeIndex = state.routes.indexOf(route);
     const isFocused = state.index === routeIndex;
 
@@ -64,7 +70,11 @@ export function BottomTabBar({
             },
           ]}
         >
-          <Image source={icon} style={styles.tabIcon} resizeMode="contain" />
+          <Image
+            source={icon}
+            style={styles.tabIcon}
+            resizeMode="contain"
+          />
         </View>
       </Pressable>
     );
@@ -73,6 +83,7 @@ export function BottomTabBar({
   const visibleRoutes = state.routes.filter(
     (route) => route.name in ICON_BY_ROUTE_NAME,
   );
+
   const leftRoutes = visibleRoutes.slice(0, 2);
   const rightRoutes = visibleRoutes.slice(2, 4);
 
@@ -80,7 +91,9 @@ export function BottomTabBar({
     <View
       style={[
         styles.wrapper,
-        { paddingBottom: insets.bottom || theme.spacing[16] },
+        {
+          paddingBottom: insets.bottom || theme.spacing[16],
+        },
       ]}
       pointerEvents="box-none"
     >
@@ -97,29 +110,45 @@ export function BottomTabBar({
         <View style={styles.tabGroup}>
           {leftRoutes.map((route) => renderTabIcon(route))}
         </View>
-        <View style={{ width: FAB_SIZE + theme.spacing[16] }} />
+
+        {showAddButton && (
+          <View
+            style={{
+              width: FAB_SIZE + theme.spacing[16],
+            }}
+          />
+        )}
+
         <View style={styles.tabGroup}>
           {rightRoutes.map((route) => renderTabIcon(route))}
         </View>
       </View>
 
-      <Pressable
-        onPress={onAddPress}
-        style={[
-          styles.fab,
-          {
-            backgroundColor: theme.colors.primary,
-            borderRadius: theme.radii.full,
-            ...theme.elevation.level2,
-          },
-        ]}
-      >
-        <Image
-          source={AppAssets.ADD_ICON}
-          style={[styles.fabIcon, { tintColor: theme.colors.onPrimary }]}
-          resizeMode="contain"
-        />
-      </Pressable>
+      {showAddButton && (
+        <Pressable
+          onPress={onAddPress}
+          style={[
+            styles.fab,
+            {
+              backgroundColor: theme.colors.primary,
+              borderRadius: theme.radii.full,
+              ...theme.elevation.level2,
+            },
+          ]}
+        >
+          <Image
+            source={AppAssets.ADD_ICON}
+            style={[
+              styles.fabIcon,
+              {
+                tintColor: theme.colors.onPrimary,
+              },
+            ]}
+            resizeMode="contain"
+          />
+        </Pressable>
+      )}
     </View>
   );
 }
+
