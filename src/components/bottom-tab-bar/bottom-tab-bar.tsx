@@ -1,4 +1,3 @@
-
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Image, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,12 +7,29 @@ import styles from "./bottom-tab-bar-styles";
 import AppAssets from "@/src/constants/app-assets";
 import { useTheme } from "@/src/theme";
 
-/** Route name → its icon. */
-const ICON_BY_ROUTE_NAME: Record<string, number> = {
-  index: AppAssets.HOME_ICON,
-  planner: AppAssets.CALENDAR_ICON,
-  completed: AppAssets.HISTORY_ICON,
-  pomodoro: AppAssets.PROFILE_ICON,
+interface RouteIcons {
+  active: number;
+  inactive: number;
+}
+
+/** Route name → its active/inactive icon pair. */
+const ICONS_BY_ROUTE_NAME: Record<string, RouteIcons> = {
+  index: {
+    active: AppAssets.HOME_ACTIVE_ICON,
+    inactive: AppAssets.HOME_INACTIVE_ICON,
+  },
+  planner: {
+    active: AppAssets.PLANNER_ACTIVE_ICON,
+    inactive: AppAssets.PLANNER_INACTIVE_ICON,
+  },
+  completed: {
+    active: AppAssets.COMPLETED_ACTIVE_ICON,
+    inactive: AppAssets.COMPLETED_INACTIVE_ICON,
+  },
+  pomodoro: {
+    active: AppAssets.POMODORO_ACTIVE_ICON,
+    inactive: AppAssets.POMODORO_INACTIVE_ICON,
+  },
 };
 
 const FAB_SIZE = 64;
@@ -33,9 +49,9 @@ export function BottomTabBar({
   const insets = useSafeAreaInsets();
 
   const renderTabIcon = (route: (typeof state.routes)[number]) => {
-    const icon = ICON_BY_ROUTE_NAME[route.name];
+    const icons = ICONS_BY_ROUTE_NAME[route.name];
 
-    if (!icon) return null;
+    if (!icons) return null;
 
     const routeIndex = state.routes.indexOf(route);
     const isFocused = state.index === routeIndex;
@@ -59,19 +75,9 @@ export function BottomTabBar({
         hitSlop={12}
         style={styles.tabButton}
       >
-        <View
-          style={[
-            styles.tabIconHighlight,
-            {
-              backgroundColor: isFocused
-                ? theme.colors.primarySurface
-                : "transparent",
-              borderRadius: theme.radii.full,
-            },
-          ]}
-        >
+        <View style={styles.tabIconHighlight}>
           <Image
-            source={icon}
+            source={isFocused ? icons.active : icons.inactive}
             style={styles.tabIcon}
             resizeMode="contain"
           />
@@ -81,7 +87,7 @@ export function BottomTabBar({
   };
 
   const visibleRoutes = state.routes.filter(
-    (route) => route.name in ICON_BY_ROUTE_NAME,
+    (route) => route.name in ICONS_BY_ROUTE_NAME,
   );
 
   const leftRoutes = visibleRoutes.slice(0, 2);
@@ -151,4 +157,3 @@ export function BottomTabBar({
     </View>
   );
 }
-

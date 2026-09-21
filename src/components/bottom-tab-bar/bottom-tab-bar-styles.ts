@@ -1,9 +1,9 @@
 import { StyleSheet } from "react-native";
 
-const BAR_HEIGHT = 76;
-const FAB_SIZE = 64;
-const ICON_SIZE = 28;
-const FAB_ICON_SIZE = 36;
+const BAR_HEIGHT = 70;
+const FAB_SIZE = 70;
+const ICON_SIZE = 36;
+const FAB_ICON_SIZE = 40;
 
 const styles = StyleSheet.create({
   wrapper: {
