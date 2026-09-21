@@ -4,7 +4,7 @@
     "slug": "Tasky",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app-icon.png",
     "scheme": "tasky",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -47,6 +47,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d3ff8c68-ffb0-4a77-9905-3aee24aead59"
+      }
     }
   }
 }

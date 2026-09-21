@@ -4,6 +4,7 @@ import { useTheme } from "@/src/theme";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { FlatList, Pressable, Text, View } from "react-native";
+import { InProgressEmpty } from "./in-progress-empty";
 import styles from "./in-progress-section-styles";
 
 /** The only two card colors used here — alternated by index. */
@@ -122,22 +123,7 @@ export function InProgressSection() {
         </View>
       ) : tasks.length === 0 ? (
         /* Empty State */
-        <View
-          style={{
-            paddingTop: theme.spacing[16],
-          }}
-        >
-          <Text
-            style={[
-              theme.typography.body,
-              {
-                color: theme.colors.textSecondary,
-              },
-            ]}
-          >
-            No tasks in progress.
-          </Text>
-        </View>
+        <InProgressEmpty />
       ) : (
         /* Tasks */
         <FlatList

@@ -1,5 +1,15 @@
-import { StyleSheet, Text, TextInput as RNTextInput, TextInputProps, View, ViewStyle } from "react-native";
 import { useTheme } from "@/src/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import {
+  Pressable,
+  TextInput as RNTextInput,
+  StyleSheet,
+  Text,
+  TextInputProps,
+  View,
+  ViewStyle,
+} from "react-native";
 import { IconSymbol, IconSymbolName } from "./ui/icon-symbol";
 
 interface InputProps extends TextInputProps {
@@ -7,14 +17,31 @@ interface InputProps extends TextInputProps {
   icon?: IconSymbolName;
   containerStyle?: ViewStyle;
   error?: string;
+  secureToggle?: boolean;
 }
 
-export function TextInput({ label, icon, containerStyle, error, ...props }: InputProps) {
+export function TextInput({
+  label,
+  icon,
+  containerStyle,
+  error,
+  secureToggle = false,
+  secureTextEntry,
+  ...props
+}: InputProps) {
   const { colors, typography, radii, spacing } = useTheme();
+  const [isVisible, setIsVisible] = useState(false);
+
+  const resolvedSecureTextEntry = secureToggle ? !isVisible : secureTextEntry;
 
   return (
     <View style={[styles.container, containerStyle]}>
-      <Text style={[typography.bodyBold, { color: colors.textPrimary, marginBottom: spacing[8] }]}>
+      <Text
+        style={[
+          typography.bodyBold,
+          { color: colors.textPrimary, marginBottom: spacing[8] },
+        ]}
+      >
         {label}
       </Text>
       <View
@@ -37,17 +64,29 @@ export function TextInput({ label, icon, containerStyle, error, ...props }: Inpu
           />
         )}
         <RNTextInput
-          style={[
-            styles.input,
-            typography.body,
-            { color: colors.textPrimary },
-          ]}
+          style={[styles.input, typography.body, { color: colors.textPrimary }]}
           placeholderTextColor={colors.textDisabled}
+          secureTextEntry={resolvedSecureTextEntry}
           {...props}
         />
+        {secureToggle && (
+          <Pressable
+            onPress={() => setIsVisible((prev) => !prev)}
+            hitSlop={8}
+            style={styles.rightIcon}
+          >
+            <Ionicons
+              name={isVisible ? "eye" : "eye-off"}
+              size={20}
+              color={colors.textDisabled}
+            />
+          </Pressable>
+        )}
       </View>
       {error ? (
-        <Text style={[typography.caption, { color: colors.error, marginTop: 4 }]}>
+        <Text
+          style={[typography.caption, { color: colors.error, marginTop: 4 }]}
+        >
           {error}
         </Text>
       ) : null}
@@ -68,6 +107,9 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 12,
+  },
+  rightIcon: {
+    marginLeft: 12,
   },
   input: {
     flex: 1,

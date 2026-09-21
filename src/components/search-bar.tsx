@@ -42,6 +42,7 @@ export function SearchBar({
             marginLeft: spacing[8],
             color: colors.textPrimary,
             padding: 0,
+            paddingTop: spacing[4],
           },
         ]}
         returnKeyType="search"

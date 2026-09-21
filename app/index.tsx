@@ -1,18 +1,20 @@
-import { View, StyleSheet, Animated } from "react-native";
-import { useTheme } from "@/src/theme";
-import { useEffect, useRef, useState } from "react";
-import { useRouter, useRootNavigationState } from "expo-router";
-import { Image } from "expo-image";
 import { authStorage } from "@/src/storage/auth";
 import { onboardingStorage } from "@/src/storage/onboarding";
+import { useTheme } from "@/src/theme";
+import { Image } from "expo-image";
+import { useRootNavigationState, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { Animated, StyleSheet, View } from "react-native";
 
 export default function SplashScreen() {
   const { colors, spacing } = useTheme();
   const router = useRouter();
   const rootNavigationState = useRootNavigationState();
-  const opacity = useRef(new Animated.Value(0)).current;
-  
-  const [nextRoute, setNextRoute] = useState<"tabs" | "login" | "onboarding" | null>(null);
+  const [opacity] = useState(() => new Animated.Value(0));
+
+  const [nextRoute, setNextRoute] = useState<
+    "tabs" | "login" | "onboarding" | null
+  >(null);
 
   useEffect(() => {
     Animated.timing(opacity, {
@@ -23,8 +25,8 @@ export default function SplashScreen() {
 
     const checkAuthAndNavigate = async () => {
       // Simulate splash delay
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+
       const token = await authStorage.getToken();
       const hasCompletedOnboarding = await onboardingStorage.getHasCompleted();
 
@@ -38,7 +40,7 @@ export default function SplashScreen() {
     };
 
     checkAuthAndNavigate();
-  }, []);
+  }, [opacity]);
 
   useEffect(() => {
     // Only navigate when both the route is determined and navigation state is ready
@@ -51,11 +53,13 @@ export default function SplashScreen() {
         router.replace("/(auth)/onboarding");
       }
     }
-  }, [nextRoute, rootNavigationState?.key]);
+  }, [nextRoute, rootNavigationState?.key, router]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surface }]}>
-      <Animated.View style={{ opacity, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View
+        style={{ opacity, alignItems: "center", justifyContent: "center" }}
+      >
         <Image
           source={require("@/assets/images/splash-logo.jpg")}
           style={styles.logo}
