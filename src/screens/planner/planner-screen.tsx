@@ -117,7 +117,20 @@ function DailyView({ date }: { date: Date }) {
     <FlatList
       data={tasks}
       keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => <TaskCard task={item} />}
+      renderItem={({ item, index }) => (
+        <View
+          key={item.id}
+          style={
+            index > 0
+              ? {
+                  marginTop: 16,
+                }
+              : undefined
+          }
+        >
+          <TaskCard task={item} />
+        </View>
+      )}
       contentContainerStyle={styles.listContent}
       showsVerticalScrollIndicator={false}
     />

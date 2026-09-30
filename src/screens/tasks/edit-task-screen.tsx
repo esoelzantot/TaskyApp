@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 import styles from "./edit-task-styles";
@@ -54,46 +54,127 @@ export function EditTaskScreen({
   submitting = false,
 }: EditTaskScreenProps) {
   const { colors, spacing } = useTheme();
+
   const { data: categories, isLoading: categoriesLoading } =
     useGetCategoriesQuery();
 
-  const [categoryId, setCategoryId] = useState<Category["id"] | null>(
-    initialValues.categoryId,
-  );
-  const [categoryName, setCategoryName] = useState<string | null>(
-    initialValues.categoryName || null,
-  );
-  const [projectName, setProjectName] = useState(initialValues.projectName);
-  const [description, setDescription] = useState(initialValues.description);
-  const [dueDate, setDueDate] = useState<Date | null>(initialValues.dueDate);
-  const [priority, setPriority] = useState<Priority | null>(
-    initialValues.priority,
-  );
-  const [status, setStatus] = useState<TaskStatus | null>(initialValues.status);
+  // ---------------------------------------------------------------------------
+  // Form state
+  // ---------------------------------------------------------------------------
 
-  useEffect(() => {
-    if (categoryName || !categories || categoryId === null) return;
-    const match = categories.find((category) => category.id === categoryId);
-    if (match) setCategoryName(match.name);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const [categoryId, setCategoryId] = useState<Category["id"] | null>(
+    initialValues.categoryId ?? null,
+  );
+
+  const [projectName, setProjectName] = useState(
+    initialValues.projectName ?? "",
+  );
+
+  const [description, setDescription] = useState(
+    initialValues.description ?? "",
+  );
+
+  const [dueDate, setDueDate] = useState<Date | null>(
+    initialValues.dueDate ?? null,
+  );
+
+  const [priority, setPriority] = useState<Priority | null>(
+    initialValues.priority ?? null,
+  );
+
+  const [status, setStatus] = useState<TaskStatus | null>(
+    initialValues.status ?? null,
+  );
+
+  // ---------------------------------------------------------------------------
+  // Category options
+  // ---------------------------------------------------------------------------
+
+  const categoryOptions = useMemo<DropdownFieldOption<Category["id"]>[]>(() => {
+    return (categories ?? []).map((category) => ({
+      label: category.name,
+      value: category.id,
+    }));
   }, [categories]);
 
-  const categoryOptions = useMemo<DropdownFieldOption<Category["id"]>[]>(
-    () =>
-      (categories ?? []).map((category) => ({
-        label: category.name,
-        value: category.id,
-      })),
-    [categories],
-  );
+  // ---------------------------------------------------------------------------
+  // Resolve category name from the currently selected category
+  // ---------------------------------------------------------------------------
+
+  const categoryName = useMemo(() => {
+    if (categoryId === null) {
+      return null;
+    }
+
+    const selectedCategory = categoryOptions.find(
+      (category) => String(category.value) === String(categoryId),
+    );
+
+    return selectedCategory?.label ?? initialValues.categoryName ?? null;
+  }, [categoryId, categoryOptions, initialValues.categoryName]);
+
+  // ---------------------------------------------------------------------------
+  // Normalize priority
+  //
+  // Ensures that the value passed to DropdownField exactly matches
+  // one of PRIORITY_OPTIONS.
+  // ---------------------------------------------------------------------------
+
+  const selectedPriority = useMemo<Priority | null>(() => {
+    if (!initialValues.priority && !priority) {
+      return null;
+    }
+
+    const currentPriority = priority ?? initialValues.priority;
+
+    if (!currentPriority) {
+      return null;
+    }
+
+    const normalizedPriority = PRIORITIES.find(
+      (item) => item.toLowerCase() === String(currentPriority).toLowerCase(),
+    );
+
+    return normalizedPriority ?? null;
+  }, [priority, initialValues.priority]);
+
+  // ---------------------------------------------------------------------------
+  // Normalize status
+  // ---------------------------------------------------------------------------
+
+  const selectedStatus = useMemo<TaskStatus | null>(() => {
+    if (!status && !initialValues.status) {
+      return null;
+    }
+
+    const currentStatus = status ?? initialValues.status;
+
+    if (!currentStatus) {
+      return null;
+    }
+
+    const normalizedStatus = TASK_STATUSES.find(
+      (item) => item.toLowerCase() === String(currentStatus).toLowerCase(),
+    );
+
+    return normalizedStatus ?? null;
+  }, [status, initialValues.status]);
+
+  // ---------------------------------------------------------------------------
+  // Submit validation
+  // ---------------------------------------------------------------------------
 
   const canSubmit =
     categoryId !== null &&
     !!categoryName &&
     projectName.trim().length > 0 &&
     !!dueDate &&
-    !!priority &&
-    !!status;
+    !!selectedPriority &&
+    !!selectedStatus;
+
+  // ---------------------------------------------------------------------------
+  // Submit
+  // ---------------------------------------------------------------------------
 
   const handleSubmit = () => {
     if (
@@ -101,10 +182,11 @@ export function EditTaskScreen({
       categoryId === null ||
       !categoryName ||
       !dueDate ||
-      !priority ||
-      !status
-    )
+      !selectedPriority ||
+      !selectedStatus
+    ) {
       return;
+    }
 
     onSubmit({
       taskId: initialValues.taskId,
@@ -113,30 +195,57 @@ export function EditTaskScreen({
       projectName: projectName.trim(),
       description: description.trim(),
       dueDate,
-      priority,
-      status,
+      priority: selectedPriority,
+      status: selectedStatus,
     });
   };
 
+  // ---------------------------------------------------------------------------
+  // Loading state
+  // ---------------------------------------------------------------------------
+
   if (categoriesLoading) {
     return (
-      <View style={[styles.flex, { backgroundColor: colors.background }]}>
+      <View
+        style={[
+          styles.flex,
+          {
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
         <ScreenHeader title="Edit Project" />
         <FormSkeleton />
       </View>
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Screen
+  // ---------------------------------------------------------------------------
+
   return (
     <KeyboardAvoidingView
-      style={[styles.flex, { backgroundColor: colors.background }]}
+      style={[
+        styles.flex,
+        {
+          backgroundColor: colors.background,
+        },
+      ]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScreenHeader title="Edit Project" />
+
       <ScrollView
-        contentContainerStyle={{ padding: spacing[16] }}
+        contentContainerStyle={{
+          padding: spacing[16],
+        }}
         keyboardShouldPersistTaps="handled"
       >
+        {/* ----------------------------------------------------------------- */}
+        {/* Category */}
+        {/* ----------------------------------------------------------------- */}
+
         <DropdownField
           label="Task Group"
           placeholder="Select a group"
@@ -148,10 +257,14 @@ export function EditTaskScreen({
           iconBackgroundColor={colors.accentPinkLight}
           onChange={(option) => {
             setCategoryId(option.value);
-            setCategoryName(option.label);
           }}
         />
+
         <View style={{ height: spacing[16] }} />
+
+        {/* ----------------------------------------------------------------- */}
+        {/* Project Name */}
+        {/* ----------------------------------------------------------------- */}
 
         <TextField
           label="Project Name"
@@ -159,7 +272,12 @@ export function EditTaskScreen({
           value={projectName}
           onChangeText={setProjectName}
         />
+
         <View style={{ height: spacing[16] }} />
+
+        {/* ----------------------------------------------------------------- */}
+        {/* Description */}
+        {/* ----------------------------------------------------------------- */}
 
         <TextField
           label="Description"
@@ -168,29 +286,46 @@ export function EditTaskScreen({
           onChangeText={setDescription}
           multiline
         />
+
         <View style={{ height: spacing[16] }} />
 
+        {/* ----------------------------------------------------------------- */}
+        {/* Due Date */}
+        {/* ----------------------------------------------------------------- */}
+
         <DateField label="Due Date" value={dueDate} onChange={setDueDate} />
+
         <View style={{ height: spacing[16] }} />
+
+        {/* ----------------------------------------------------------------- */}
+        {/* Priority */}
+        {/* ----------------------------------------------------------------- */}
 
         <DropdownField
           label="Priority"
           placeholder="Select priority"
           variant="tinted"
           data={PRIORITY_OPTIONS}
-          value={priority}
+          value={selectedPriority}
           icon={<Ionicons name="flag" size={18} color={colors.primary} />}
           iconBackgroundColor={colors.primaryLight}
-          onChange={(option) => setPriority(option.value)}
+          onChange={(option) => {
+            setPriority(option.value);
+          }}
         />
+
         <View style={{ height: spacing[16] }} />
+
+        {/* ----------------------------------------------------------------- */}
+        {/* Status */}
+        {/* ----------------------------------------------------------------- */}
 
         <DropdownField
           label="Status"
           placeholder="Select status"
           variant="tinted"
           data={STATUS_OPTIONS}
-          value={status}
+          value={selectedStatus}
           icon={
             <Ionicons
               name="checkmark-circle-outline"
@@ -199,12 +334,26 @@ export function EditTaskScreen({
             />
           }
           iconBackgroundColor={colors.primaryLight}
-          onChange={(option) => setStatus(option.value)}
+          onChange={(option) => {
+            setStatus(option.value);
+          }}
         />
+
         <View style={{ height: spacing[24] }} />
 
+        {/* ----------------------------------------------------------------- */}
+        {/* Actions */}
+        {/* ----------------------------------------------------------------- */}
+
         <View style={styles.buttonRow}>
-          <View style={[styles.buttonSlot, { marginRight: spacing[8] }]}>
+          <View
+            style={[
+              styles.buttonSlot,
+              {
+                marginRight: spacing[8],
+              },
+            ]}
+          >
             <PrimaryButton
               label="Edit"
               onPress={handleSubmit}
@@ -212,7 +361,15 @@ export function EditTaskScreen({
               disabled={!canSubmit}
             />
           </View>
-          <View style={[styles.buttonSlot, { marginLeft: spacing[8] }]}>
+
+          <View
+            style={[
+              styles.buttonSlot,
+              {
+                marginLeft: spacing[8],
+              },
+            ]}
+          >
             <DangerButton
               label="Cancel"
               onPress={onCancel}

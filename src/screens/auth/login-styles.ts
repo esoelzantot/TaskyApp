@@ -18,10 +18,10 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     padding: 24,
-    shadowOffset: { width: 0, height: -4 },
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowRadius: 8,
+    elevation: 4,
   },
   cardHeader: {
     flexDirection: "row",

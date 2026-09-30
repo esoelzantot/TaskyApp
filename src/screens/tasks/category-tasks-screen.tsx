@@ -40,7 +40,7 @@ const PRIORITY_OPTIONS: {
   value: PriorityValue;
 }[] = [
   {
-    label: "Priority",
+    label: "All",
     value: "All",
   },
   {
@@ -95,7 +95,9 @@ export function CategoryTasksScreen({
         filter === "All" || (task.completed ? "Done" : "To-do") === filter;
 
       // Priority filter
-      const matchesPriority = priority === "All" || task.priority === priority;
+      const matchesPriority =
+        priority === "All" ||
+        task.priority.toLowerCase() === priority.toLowerCase();
 
       // Search filter
       const matchesSearch =
